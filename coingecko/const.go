@@ -8,6 +8,7 @@ const (
 
 const (
 	applicationJSONHeader = "application/json"
+	proAPIKeyQueryParam   = "x_cg_pro_api_key"
 )
 
 // CoinGecko API path
@@ -17,7 +18,8 @@ const (
 	pingPath = "/ping"
 
 	// simple
-	simplePricePath           = "/simple/price"
+	simplePricePath = "/simple/price"
+	// the format specifier is id of the platform issuing tokens.
 	simpleTokenPricePath      = "/simple/token_price/%s"
 	supportedVsCurrenciesPath = "/simple/supported_vs_currencies"
 
