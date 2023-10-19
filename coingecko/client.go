@@ -3,7 +3,6 @@ package coingecko
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
@@ -43,6 +42,8 @@ func (c *Client) sendReq(ctx context.Context, endpoint string) ([]byte, error) {
 		slog.Error("failed to new request with context", "error", err)
 		return nil, err
 	}
+
+	req = c.checkAPIKey(req)
 	data, err := c.doAPI(ctx, req)
 	if err != nil {
 		slog.Error("failed to do api", "url", req.URL.String(), "error", err)
@@ -59,18 +60,13 @@ func (c *Client) doAPI(ctx context.Context, req *http.Request) ([]byte, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		var errResp ErrorResponse
 		data, err := io.ReadAll(resp.Body)
 		if err != nil {
 			slog.Error("failed to read error response", "error", err)
 			return nil, err
 		}
-		if err = json.Unmarshal(data, &errResp); err != nil {
-			slog.Error("failed to unmarshal error response", "error", err)
-			return nil, err
-		}
 		return nil, fmt.Errorf("failed to call %s, status code: %d, error message: %s", req.URL.String(),
-			resp.StatusCode, errResp.Error)
+			resp.StatusCode, string(data))
 	}
 
 	buf := &bytes.Buffer{}
@@ -82,11 +78,16 @@ func (c *Client) doAPI(ctx context.Context, req *http.Request) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// checkAPIKey should be called after all query params are filled
-func (c *Client) checkAPIKey(apiURL string) string {
+// check user whether provides api key, if provided adds it into http header.
+//
+// CoinGecko supports supplying API key in one of two ways:
+//
+// 1. Header: x-cg-pro-api-key
+//
+// 2. Query string parameter: x_cg_pro_api_key
+func (c *Client) checkAPIKey(req *http.Request) *http.Request {
 	if c.apiKey != "" {
-		return fmt.Sprintf("%s%s=%s", apiURL, proAPIKeyQueryParam, c.apiKey)
-	} else {
-		return apiURL
+		req.Header.Add(proAPIKeyHeader, c.apiKey)
 	}
+	return req
 }

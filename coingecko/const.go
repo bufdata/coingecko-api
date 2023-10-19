@@ -9,6 +9,7 @@ const (
 const (
 	applicationJSONHeader = "application/json"
 	proAPIKeyQueryParam   = "x_cg_pro_api_key"
+	proAPIKeyHeader       = "x-cg-pro-api-key"
 )
 
 // CoinGecko API path
@@ -25,7 +26,7 @@ const (
 
 	// coins
 	coinsListPath             = "/coins/list"
-	coinsMarkets              = "/coins/markets"
+	coinsMarketsPath          = "/coins/markets"
 	coinsIDPath               = "/coins/%s"
 	coinsTickersPath          = "/coins/%s/tickers"
 	coinsHistoryPath          = "/coins/%s/history"
