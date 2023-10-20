@@ -36,26 +36,26 @@ func NewCoinGecko(apiKey string, httpClient *http.Client) *Client {
 	}
 }
 
-func (c *Client) sendReq(ctx context.Context, endpoint string) ([]byte, error) {
+func (c *Client) sendReq(ctx context.Context, endpoint string) ([]byte, http.Header, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		slog.Error("failed to new request with context", "error", err)
-		return nil, err
+		return nil, nil, err
 	}
 
 	req = c.checkAPIKey(req)
-	data, err := c.doAPI(ctx, req)
+	data, header, err := c.doAPI(ctx, req)
 	if err != nil {
 		slog.Error("failed to do api", "url", req.URL.String(), "error", err)
 	}
-	return data, nil
+	return data, header, nil
 }
 
-func (c *Client) doAPI(ctx context.Context, req *http.Request) ([]byte, error) {
+func (c *Client) doAPI(ctx context.Context, req *http.Request) ([]byte, http.Header, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		slog.Error("failed to do", "error", err)
-		return nil, err
+		return nil, nil, err
 	}
 	defer resp.Body.Close()
 
@@ -63,9 +63,9 @@ func (c *Client) doAPI(ctx context.Context, req *http.Request) ([]byte, error) {
 		data, err := io.ReadAll(resp.Body)
 		if err != nil {
 			slog.Error("failed to read error response", "error", err)
-			return nil, err
+			return nil, nil, err
 		}
-		return nil, fmt.Errorf("failed to call %s, status code: %d, error message: %s", req.URL.String(),
+		return nil, nil, fmt.Errorf("failed to call %s, status code: %d, error message: %s", req.URL.String(),
 			resp.StatusCode, string(data))
 	}
 
@@ -73,9 +73,9 @@ func (c *Client) doAPI(ctx context.Context, req *http.Request) ([]byte, error) {
 	_, err = io.Copy(buf, resp.Body)
 	if err != nil {
 		slog.Error("failed to parse resp body", "error", err)
-		return nil, err
+		return nil, nil, err
 	}
-	return buf.Bytes(), nil
+	return buf.Bytes(), resp.Header, nil
 }
 
 // check user whether provides api key, if provided adds it into http header.

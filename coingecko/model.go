@@ -101,3 +101,20 @@ type CoinsIDResponse struct {
 	LastUpdated                  time.Time               `json:"last_updated"`
 	Tickers                      *[]TickersItem          `json:"tickers,omitempty"`
 }
+
+// CoinsIDTickersResponse returned by CoinsIDTickers API.
+type CoinsIDTickersResponse struct {
+	Name    string        `json:"name"`
+	Tickers []TickersItem `json:"tickers"`
+}
+
+// CoinsIDHistoryResponse returned by CoinsIDHistory API.
+type CoinsIDHistoryResponse struct {
+	coinsStruct
+	Localization        LocalizationItem        `json:"localization,omitempty"`
+	Image               ImageItem               `json:"image"`
+	MarketData          MarketDataForHistory    `json:"market_data"`
+	CommunityData       *CommunityDataItem      `json:"community_data"`
+	DeveloperData       *DeveloperDataItem      `json:"developer_data"`
+	PublicInterestStats PublicInterestStatsItem `json:"public_interest_stats"`
+}

@@ -13,7 +13,7 @@ import (
 // Ping checks API server status.
 func (c *Client) Ping(ctx context.Context) (*PingResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, pingPath)
-	resp, err := c.sendReq(ctx, endpoint)
+	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
 		slog.Error("failed to send request to ping api", "error", err)
 		return nil, err
@@ -84,7 +84,7 @@ func (c *Client) SimplePrice(ctx context.Context, ids, vsCurrencies []string, in
 	}
 
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, simplePricePath, params.Encode())
-	resp, err := c.sendReq(ctx, endpoint)
+	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
 		slog.Error("failed to send request to simple price api", "error", err)
 		return nil, err
@@ -165,7 +165,7 @@ func (c *Client) SimpleTokenPrice(ctx context.Context, id string, contractAddres
 
 	path := fmt.Sprintf(simpleTokenPricePath, id)
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
-	resp, err := c.sendReq(ctx, endpoint)
+	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
 		slog.Error("failed to send request to simple token price api", "error", err)
 		return nil, err
@@ -184,7 +184,7 @@ func (c *Client) SimpleTokenPrice(ctx context.Context, id string, contractAddres
 // Cache/Update Frequency: every 60 seconds.
 func (c *Client) SimpleSupportedVSCurrencies(ctx context.Context) (*SimpleSupportedVSCurrenciesResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, supportedVsCurrenciesPath)
-	resp, err := c.sendReq(ctx, endpoint)
+	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
 		slog.Error("failed to send request to simple supported vs currencies api", "error", err)
 		return nil, err
@@ -214,7 +214,7 @@ func (c *Client) CoinsList(ctx context.Context, includePlatform bool) (*[]CoinsL
 	params := url.Values{}
 	params.Add("include_platform", strconv.FormatBool(includePlatform))
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, coinsListPath, params.Encode())
-	resp, err := c.sendReq(ctx, endpoint)
+	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
 		slog.Error("failed to send request to coins list api", "error", err)
 		return nil, err
@@ -302,7 +302,7 @@ func (c *Client) CoinsMarkets(ctx context.Context, vsCurrency string, ids []stri
 	}
 
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, coinsMarketsPath, params.Encode())
-	resp, err := c.sendReq(ctx, endpoint)
+	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
 		slog.Error("failed to send request to simple token price api", "error", err)
 		return nil, err
@@ -340,21 +340,21 @@ func (c *Client) CoinsMarkets(ctx context.Context, vsCurrency string, ids []stri
 //
 // Path parameters:
 //
-// id(string, required): pass the coin id (can be obtained from /coins) eg. bitcoin.
+// id(required): pass the coin id (can be obtained from /coins) eg. bitcoin.
 //
 // Query parameters:
 //
-// localization(bool, optional): include all localized languages in response (true/false) [default: true].
+// localization(optional): include all localized languages in response (true/false) [default: true].
 //
-// tickers(bool, optional): include tickers data (true/false) [default: true].
+// tickers(optional): include tickers data (true/false) [default: true].
 //
-// market_data(bool, optional): include market_data (true/false) [default: true].
+// market_data(optional): include market_data (true/false) [default: true].
 //
-// community_data(bool, optional): include community_data data (true/false) [default: true].
+// community_data(optional): include community_data data (true/false) [default: true].
 //
-// developer_data(bool, optional): include developer_data data (true/false) [default: true].
+// developer_data(optional): include developer_data data (true/false) [default: true].
 //
-// sparkline(bool, optional): include sparkline 7 days data (eg. true, false) [default: false].
+// sparkline(optional): include sparkline 7 days data (eg. true, false) [default: false].
 func (c *Client) CoinsID(ctx context.Context, id string, localization, tickers, marketData, communityData,
 	developerData, sparkline bool) (*CoinsIDResponse, error) {
 	if id == "" {
@@ -371,7 +371,7 @@ func (c *Client) CoinsID(ctx context.Context, id string, localization, tickers, 
 
 	path := fmt.Sprintf(coinsIDPath, id)
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
-	resp, err := c.sendReq(ctx, endpoint)
+	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
 		slog.Error("failed to send request to coins id api", "error", err)
 		return nil, err
@@ -380,6 +380,126 @@ func (c *Client) CoinsID(ctx context.Context, id string, localization, tickers, 
 	var data CoinsIDResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins id response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// CoinsIDTickers gets coin tickers (paginated to 100 items).
+//
+// IMPORTANT:
+// Ticker is_stale is true when ticker that has not been updated/unchanged from the exchange for more than 8 hours.
+// Ticker is_anomaly is true if ticker's price is outliered by our system.
+// You are responsible for managing how you want to display these information (e.g. footnote, different background, change opacity, hide)
+//
+// Dictionary:
+//
+// last: latest unconverted price in the respective pair target currency.
+//
+// volume: unconverted 24h trading volume in the respective pair target currency.
+//
+// converted_last: latest converted price in BTC, ETH, and USD.
+//
+// converted_volume: converted 24h trading volume in BTC, ETH, and USD.
+//
+// Cache/Update Frequency: every 2 minutes.
+//
+// Path parameters:
+//
+// id(required): pass the coin id (can be obtained from /coins) eg. bitcoin.
+//
+// Query parameters:
+//
+// exchange_ids(optional): filter results by exchange_ids (ref: v3/exchanges/list).
+//
+// include_exchange_logo(optional): flag to show exchange_logo. valid values: true, false.
+//
+// page(optional): page through results.
+//
+// order(optional): valid values: trust_score_desc (default), trust_score_asc and volume_desc.
+//
+// depth(optional): flag to show 2% orderbook depth. i.e., cost_to_move_up_usd and cost_to_move_down_usd. valid
+// values: true, false.
+func (c *Client) CoinsIDTickers(ctx context.Context, id, exchangeIDs string, includeExchangeLogo bool, page uint,
+	order string, depth bool) (*CoinsIDTickersResponse, int, error) {
+	if id == "" {
+		return nil, -1, fmt.Errorf("id should not be empty")
+	}
+
+	params := url.Values{}
+	if exchangeIDs != "" {
+		params.Add("exchange_ids", exchangeIDs)
+	}
+	params.Add("include_exchange_logo", strconv.FormatBool(includeExchangeLogo))
+	if page != 0 {
+		params.Add("page", strconv.Itoa(int(page)))
+	}
+	if order != "" {
+		params.Add("order", order)
+	}
+	params.Add("depth", strconv.FormatBool(depth))
+
+	path := fmt.Sprintf(coinsTickersPath, id)
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
+	resp, header, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to coins tickers api", "error", err)
+		return nil, -1, err
+	}
+
+	total := header.Get("total")
+	totalInt, err := strconv.Atoi(total)
+	if err != nil {
+		slog.Error("failed to parse total http response header", "total", totalInt)
+		return nil, -1, err
+	}
+	pageCount := totalInt/100 + 1
+
+	var data CoinsIDTickersResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal coins tickers response", "error", err)
+		return nil, -1, err
+	}
+	return &data, pageCount, nil
+}
+
+// CoinsIDHistory gets historical data (price, market cap, 24hr volume, ..) at a given date for a coin.
+//
+// The data returned is at 00:00:00 UTC.
+// The last completed UTC day (00:00) is available 35 minutes after midnight on the next UTC day (00:35).
+//
+// Path parameters:
+//
+// id(required): pass the coin id (can be obtained from /coins) eg. bitcoin.
+//
+// Query parameters:
+//
+// date(required): the date of data snapshot in dd-mm-yyyy eg. 30-12-2022.
+//
+// localization(optional): set false to exclude localized languages in response.
+func (c *Client) CoinsIDHistory(ctx context.Context, id, date string, localization bool) (*CoinsIDHistoryResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("id should not be empty")
+	}
+	if date == "" {
+		return nil, fmt.Errorf("date should not be empty")
+	}
+
+	params := url.Values{}
+	params.Add("date", date)
+	params.Add("localization", strconv.FormatBool(localization))
+
+	path := fmt.Sprintf(coinsHistoryPath, id)
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to coins history api", "error", err)
+		return nil, err
+	}
+
+	var data CoinsIDHistoryResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal coins history response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -403,7 +523,7 @@ func (c *Client) AssetPlatforms(ctx context.Context, filter string) (*[]AssetPla
 		endpoint = fmt.Sprintf("%s%s", c.apiURL, assetPlatformsPath)
 	}
 
-	resp, err := c.sendReq(ctx, endpoint)
+	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
 		slog.Error("failed to send request to asset platforms api", "error", err)
 		return nil, err
