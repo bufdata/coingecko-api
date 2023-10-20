@@ -106,6 +106,24 @@ func TestClient_CoinsID(t *testing.T) {
 	slog.Info("call CoinsID successfully", "response data", data.Name)
 }
 
+func TestClient_CoinsIDTickers(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, pageCount, err := api.CoinsIDTickers(context.Background(), "ethereum", "", true, 1, emptyString, true)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call CoinsIDTickers successfully", "response data", data.Name, "page count", pageCount)
+}
+
+func TestClient_CoinsIDHistory(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.CoinsIDHistory(context.Background(), "ethereum", "01-10-2023", true)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call CoinsIDHistory successfully", "response data", data.Name)
+}
+
 func TestClient_AssetPlatforms(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
 	data, err := api.AssetPlatforms(context.Background(), "")

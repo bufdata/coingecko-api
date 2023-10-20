@@ -1,6 +1,9 @@
 package coingecko
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type coinsStruct struct {
 	ID     string `json:"id"`
@@ -44,7 +47,7 @@ type LinksItem map[string]any
 type ImageItem struct {
 	Thumb string `json:"thumb"`
 	Small string `json:"small"`
-	Large string `json:"large"`
+	Large string `json:"large,omitempty"`
 }
 
 // ICODataItem describes ico data.
@@ -106,13 +109,13 @@ type MarketDataItem struct {
 
 // CommunityDataItem describes community data.
 type CommunityDataItem struct {
-	FacebookLikes            *uint   `json:"facebook_likes"`
-	TwitterFollowers         int32   `json:"twitter_followers"`
-	RedditAveragePosts48h    float64 `json:"reddit_average_posts_48h"`
-	RedditAverageComments48h float64 `json:"reddit_average_comments_48h"`
-	RedditSubscribers        uint    `json:"reddit_subscribers"`
-	RedditAccountsActive48h  float64 `json:"reddit_accounts_active_48h"`
-	TelegramChannelUserCount *uint   `json:"telegram_channel_user_count"`
+	FacebookLikes            *uint           `json:"facebook_likes"`
+	TwitterFollowers         int32           `json:"twitter_followers"`
+	RedditAveragePosts48h    float64         `json:"reddit_average_posts_48h"`
+	RedditAverageComments48h float64         `json:"reddit_average_comments_48h"`
+	RedditSubscribers        uint            `json:"reddit_subscribers"`
+	RedditAccountsActive48h  json.RawMessage `json:"reddit_accounts_active_48h"`
+	TelegramChannelUserCount *uint           `json:"telegram_channel_user_count,omitempty"`
 }
 
 // DeveloperDataItem describes developer data.
@@ -129,7 +132,7 @@ type DeveloperDataItem struct {
 		Deletions *int `json:"deletions"`
 	} `json:"code_additions_deletions_4_weeks"`
 	CommitCount4Weeks              uint  `json:"commit_count_4_weeks"`
-	Last4WeeksCommitActivitySeries []int `json:"last_4_weeks_commit_activity_series"`
+	Last4WeeksCommitActivitySeries []int `json:"last_4_weeks_commit_activity_series,omitempty"`
 }
 
 // PublicInterestStatsItem map all public interest stats.
@@ -146,9 +149,12 @@ type TickersItem struct {
 		Name                string `json:"name"`
 		Identifier          string `json:"identifier"`
 		HasTradingIncentive bool   `json:"has_trading_incentive"`
+		Logo                string `json:"logo,omitempty"`
 	} `json:"market"`
 	Last                   float64            `json:"last"`
 	Volume                 float64            `json:"volume"`
+	CostToMoveUpUsd        float64            `json:"cost_to_move_up_usd,omitempty"`
+	CostToMoveDownUsd      float64            `json:"cost_to_move_down_usd,omitempty"`
 	ConvertedLast          map[string]float64 `json:"converted_last"`
 	ConvertedVolume        map[string]float64 `json:"converted_volume"`
 	TrustScore             string             `json:"trust_score"`
@@ -162,4 +168,11 @@ type TickersItem struct {
 	TokenInfoURL           *string            `json:"token_info_url"`
 	CoinID                 string             `json:"coin_id"`
 	TargetCoinID           string             `json:"target_coin_id,omitempty"`
+}
+
+// MarketDataForHistory used for CoinsHistory API.
+type MarketDataForHistory struct {
+	CurrentPrice AllCurrencies `json:"current_price"`
+	MarketCap    AllCurrencies `json:"market_cap"`
+	TotalVolume  AllCurrencies `json:"total_volume"`
 }
