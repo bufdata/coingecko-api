@@ -505,6 +505,204 @@ func (c *Client) CoinsIDHistory(ctx context.Context, id, date string, localizati
 	return &data, nil
 }
 
+// CoinsIDMarketChart gets historical market data include price, market cap, and 24h volume (granularity auto).
+//
+// Data granularity is automatic (cannot be adjusted):
+//
+// 1 day from current time = 5 minute interval data.
+//
+// 2-90 days from current time = hourly data.
+//
+// above 90 days from current time = daily data (00:00 UTC).
+//
+// Cache/Update Frequency: every 5 minutes.
+//
+// The last completed UTC day (00:00) is available 35 minutes after midnight on the next UTC day (00:35).
+//
+// Path parameters:
+//
+// id(required): pass the coin id (can be obtained from /coins) eg. bitcoin.
+//
+// Query parameters:
+//
+// id(required): pass the coin id (can be obtained from /coins) eg. bitcoin.
+//
+// vs_currency(required): the target currency of market data (usd, eur, jpy, etc.).
+//
+// days(required): data up to number of days ago (eg. 1,14,30,max).
+//
+// interval(optional): data interval. Possible value: daily.
+//
+// precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
+func (c *Client) CoinsIDMarketChart(ctx context.Context, id, vsCurrency, days, interval, precision string) (
+	*CoinsIDMarketChartResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("id should not be empty")
+	}
+	if vsCurrency == "" {
+		return nil, fmt.Errorf("vs_currency should not be empty")
+	}
+	if days == "" {
+		return nil, fmt.Errorf("days should not be empty")
+	}
+
+	params := url.Values{}
+	params.Add("vs_currency", vsCurrency)
+	params.Add("days", days)
+	if interval != "" {
+		params.Add("interval", interval)
+	}
+	if precision != "" {
+		params.Add("precision", precision)
+	}
+
+	path := fmt.Sprintf(coinsMarketChartPath, id)
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to coins market chart api", "error", err)
+		return nil, err
+	}
+
+	var data CoinsIDMarketChartResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal coins market chart response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// CoinsIDMarketChartRange gets historical market data include price, market cap, and 24h volume (granularity auto).
+//
+// Data granularity is automatic (cannot be adjusted):
+//
+// 1 day from current time = 5 minute interval data.
+//
+// 2-90 days from current time = hourly data.
+//
+// above 90 days from current time = daily data (00:00 UTC).
+//
+// Cache/Update Frequency: every 5 minutes.
+//
+// The last completed UTC day (00:00) is available 35 minutes after midnight on the next UTC day (00:35).
+//
+// Path parameters:
+//
+// id(required): pass the coin id (can be obtained from /coins) eg. bitcoin.
+//
+// Query parameters:
+//
+// id(required): pass the coin id (can be obtained from /coins) eg. bitcoin.
+//
+// vs_currency(required): the target currency of market data (usd, eur, jpy, etc.).
+//
+// from(required): from date in UNIX Timestamp (eg. 1392577232).
+//
+// to(required): to date in UNIX Timestamp (eg. 1422577232).
+//
+// precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
+func (c *Client) CoinsIDMarketChartRange(ctx context.Context, id, vsCurrency, from, to, precision string) (
+	*CoinsIDMarketChartResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("id should not be empty")
+	}
+	if vsCurrency == "" {
+		return nil, fmt.Errorf("vs_currency should not be empty")
+	}
+	if from == "" {
+		return nil, fmt.Errorf("from should not be empty")
+	}
+	if to == "" {
+		return nil, fmt.Errorf("to should not be empty")
+	}
+
+	params := url.Values{}
+	params.Add("vs_currency", vsCurrency)
+	params.Add("from", from)
+	params.Add("to", to)
+	if precision != "" {
+		params.Add("precision", precision)
+	}
+
+	path := fmt.Sprintf(coinsMarketChartRangePath, id)
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to coins market chart range api", "error", err)
+		return nil, err
+	}
+
+	var data CoinsIDMarketChartResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal coins market chart range response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// CoinsIDOHLC gets coin's OHLC.
+//
+// Candle's body - data granularity is automatic (cannot be adjusted for public api users):
+//
+// 1-2 days: 30 minutes.
+//
+// 3-30 days: 4 hours.
+//
+// 31 days and beyond: 4 days/
+//
+// Daily candle interval parameter is available for paid plan users only (Analyst/Lite/Pro/Enterprise), use interval=daily parameter in your request:
+//
+// 'daily' interval: available for 1/7/14/30/90/180 days/
+//
+// Cache/Update Frequency: every 30 minutes.
+//
+// The last completed UTC day (00:00) is available 35 minutes after midnight on the next UTC day (00:35).
+//
+// Path parameters:
+//
+// id(required): pass the coin id (can be obtained from /coins) eg. bitcoin.
+//
+// Query parameters:
+//
+// vs_currency(required): the target currency of market data (usd, eur, jpy, etc.).
+//
+// days(required): data up to number of days ago (1/7/14/30/90/180/365/max).
+//
+// precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
+func (c *Client) CoinsIDOHLC(ctx context.Context, id, vsCurrency, days, precision string) (*[]CoinsOHLCResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("id should not be empty")
+	}
+	if vsCurrency == "" {
+		return nil, fmt.Errorf("vs_currency should not be empty")
+	}
+	if days == "" {
+		return nil, fmt.Errorf("days should not be empty")
+	}
+
+	params := url.Values{}
+	params.Add("vs_currency", vsCurrency)
+	params.Add("days", days)
+	if precision != "" {
+		params.Add("precision", precision)
+	}
+
+	path := fmt.Sprintf(coinsOHLCPath, id)
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to coins ohlc api", "error", err)
+		return nil, err
+	}
+
+	var data []CoinsOHLCResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal coins ohlc response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
 // AssetPlatforms lists all asset platforms(Blockchain networks).
 //
 // Query parameters:

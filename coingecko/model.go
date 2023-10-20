@@ -118,3 +118,15 @@ type CoinsIDHistoryResponse struct {
 	DeveloperData       *DeveloperDataItem      `json:"developer_data"`
 	PublicInterestStats PublicInterestStatsItem `json:"public_interest_stats"`
 }
+
+// CoinsIDMarketChartResponse returned by CoinsIDMarketChart or CoinsIDMarketChartRange API.
+type CoinsIDMarketChartResponse struct {
+	Prices       []ChartItem `json:"prices"`
+	MarketCaps   []ChartItem `json:"market_caps"`
+	TotalVolumes []ChartItem `json:"total_volumes"`
+}
+
+// CoinsOHLCResponse returned by CoinsOHLC API.
+// It consists of five elements: time in unix millisecond(int64), coins opening price(float64), high price(float64),
+// low price(float64) and closing price(float64).
+type CoinsOHLCResponse [5]json.Number

@@ -176,3 +176,6 @@ type MarketDataForHistory struct {
 	MarketCap    AllCurrencies `json:"market_cap"`
 	TotalVolume  AllCurrencies `json:"total_volume"`
 }
+
+// ChartItem
+type ChartItem [2]float64
