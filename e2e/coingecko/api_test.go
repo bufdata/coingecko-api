@@ -2,8 +2,11 @@ package coingecko
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"log/slog"
+	"os"
 	"testing"
 
 	"github.com/neuprotron/coingecko-api/coingecko"
@@ -187,4 +190,78 @@ func TestClient_AssetPlatforms(t *testing.T) {
 		log.Fatalln(err)
 	}
 	slog.Info("call AssetPlatforms successfully", "response data", *data)
+}
+
+func TestClient_CoinsCategoriesList(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.CoinsCategoriesList(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call CoinsCategoriesList successfully", "response data", len(*data))
+}
+
+func TestClient_CoinsCategories(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.CoinsCategories(context.Background(), emptyString)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call CoinsCategories successfully", "response data", len(*data))
+}
+
+func TestClient_Exchanges(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, pageCount, err := api.Exchanges(context.Background(), 0, 0)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call Exchanges successfully", "response data", len(*data), "page count", pageCount)
+}
+
+func TestClient_ExchangesList(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.ExchangesList(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call ExchangesList successfully", "response data", len(*data))
+
+	b, err := json.Marshal(data)
+	if err != nil {
+		slog.Error("marshal error", "error", err)
+	}
+	err = os.WriteFile("./logs/exchanges_list.json", b, 0644)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("JSON文件已保存")
+}
+
+func TestClient_ExchangesID(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.ExchangesID(context.Background(), "uniswap_v3")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call ExchangesID successfully", "response data", data.Name)
+}
+
+func TestClient_ExchangesIDTickers(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, count, err := api.ExchangesIDTickers(context.Background(), "binance", "curve-dao-token", true, 1, true, "")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call ExchangesIDTickers successfully", "response data", data.Name, "count", count)
+}
+
+func TestClient_ExchangesIDVolumeChart(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.ExchangesIDVolumeChart(context.Background(), "binance", 1)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call ExchangesIDVolumeChart successfully", "response data", len(*data))
 }

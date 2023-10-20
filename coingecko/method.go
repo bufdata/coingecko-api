@@ -453,7 +453,7 @@ func (c *Client) CoinsIDTickers(ctx context.Context, id, exchangeIDs string, inc
 		slog.Error("failed to parse total http response header", "total", totalInt)
 		return nil, -1, err
 	}
-	pageCount := computePageCount(totalInt)
+	pageCount := calculateTotalPages(totalInt, 100)
 
 	var data CoinsIDTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
@@ -901,6 +901,296 @@ func (c *Client) AssetPlatforms(ctx context.Context, filter string) (*[]AssetPla
 	var data []AssetPlatformsResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal asset platforms response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// CoinsCategoriesList lists all categories.
+//
+// Cache/Update Frequency: every 5 minutes.
+func (c *Client) CoinsCategoriesList(ctx context.Context) (*[]CoinsCategoriesListResponse, error) {
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, coinsCategoriesListPath)
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to coins categories list api", "error", err)
+		return nil, err
+	}
+
+	var data []CoinsCategoriesListResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal coins categories list response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// CoinsCategories lists all categories with market data.
+//
+// Cache/Update Frequency: every 5 minutes.
+//
+// Query parameters:
+//
+// order(optional): valid values: market_cap_desc(default), market_cap_asc, name_desc, name_asc,
+// market_cap_change_24h_desc, market_cap_change_24h_asc.
+func (c *Client) CoinsCategories(ctx context.Context, order string) (*[]CoinsCategoriesResponse, error) {
+	params := url.Values{}
+	if order == "" {
+		params.Add("order", "market_cap_desc")
+	}
+
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, coinsCategoriesPath, params.Encode())
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to coins categories api", "error", err)
+		return nil, err
+	}
+
+	var data []CoinsCategoriesResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal coins categories response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// Exchanges lists all exchanges(active with trading volumes).
+//
+// Cache/Update Frequency: every 60 seconds.
+//
+// Query parameters:
+//
+// per_page(optional): Valid values: 1...250; total results per page. Default value: 100.
+//
+// page(optional): page through results.
+func (c *Client) Exchanges(ctx context.Context, perPage, page uint) (*[]ExchangesResponse, int, error) {
+	params := url.Values{}
+	if perPage == 0 {
+		params.Add("per_page", strconv.Itoa(100))
+	} else {
+		params.Add("per_page", strconv.Itoa(int(perPage)))
+	}
+	if page == 0 {
+		params.Add("page", strconv.Itoa(1))
+	} else {
+		params.Add("page", strconv.Itoa(int(page)))
+	}
+
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, exchangesPath, params.Encode())
+	fmt.Println(endpoint)
+	resp, header, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to exchanges api", "error", err)
+		return nil, -1, err
+	}
+
+	total := header.Get("total")
+	totalInt, err := strconv.Atoi(total)
+	if err != nil {
+		slog.Error("failed to parse total http response header", "total", totalInt)
+		return nil, -1, err
+	}
+	pageCount := calculateTotalPages(totalInt, 100)
+
+	var data []ExchangesResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal exchanges response", "error", err)
+		return nil, -1, err
+	}
+	return &data, pageCount, nil
+}
+
+// ExchangesList lists all supported markets id and name(no pagination required).
+//
+// Use this to obtain all the markets' id in order to make API calls.
+//
+// Cache/Update Frequency: every 5 minutes.
+func (c *Client) ExchangesList(ctx context.Context) (*[]ExchangesListResponse, error) {
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, exchangesListPath)
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to exchanges list api", "error", err)
+		return nil, err
+	}
+
+	var data []ExchangesListResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal exchanges list response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// ExchangesID gets exchange volume in BTC and top 100 tickers only.
+//
+// For derivatives (e.g. bitmex, binance_futures), please use /derivatives/exchange/{id} endpoint.
+//
+// IMPORTANT:
+// Ticker <object> is limited to 100 items, to get more tickers, use /exchanges/{id}/tickers.
+// Ticker <is_stale> is true when ticker that has not been updated/unchanged from the exchange for more than 8 hours.
+// Ticker <is_anomaly> is true if ticker's price is outliered by our system.
+// You are responsible for managing how you want to display these information(e.g. footnote, different background,
+// change opacity, hide)
+//
+// Dictionary:
+//
+// last: latest unconverted price in the respective pair target currency.
+//
+// volume: unconverted 24h trading volume in the respective pair target currency.
+//
+// converted_last: latest converted price in BTC, ETH, and USD.
+//
+// converted_volume: converted 24h trading volume in BTC, ETH, and USD.
+//
+// Cache/Update Frequency: every 60 seconds.
+//
+// Path parameters:
+//
+// id(required): pass the exchange id(can be obtained from /exchanges/list) eg. binance.
+func (c *Client) ExchangesID(ctx context.Context, id string) (*ExchangesIDResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("id should not be empty")
+	}
+
+	path := fmt.Sprintf(exchangesIDPath, id)
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, path)
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to exchanges id api", "error", err)
+		return nil, err
+	}
+
+	var data ExchangesIDResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal exchanges id response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// ExchangesIDTickers gets exchange tickers (paginated, 100 tickers per page).
+//
+// For derivatives (e.g. bitmex, binance_futures), please use /derivatives/exchange/{id} endpoint.
+//
+// IMPORTANT:
+// Ticker <is_stale> is true when ticker that has not been updated/unchanged from the exchange for more than 8 hours.
+// Ticker <is_anomaly> is true if ticker's price is outliered by our system.
+// You are responsible for managing how you want to display these information(e.g. footnote, different background,
+// change opacity, hide)
+//
+// Dictionary:
+//
+// last: latest unconverted price in the respective pair target currency.
+//
+// volume: unconverted 24h trading volume in the respective pair target currency.
+//
+// converted_last: latest converted price in BTC, ETH, and USD.
+//
+// converted_volume: converted 24h trading volume in BTC, ETH, and USD.
+//
+// Cache/Update Frequency: every 60 seconds.
+//
+// Path parameters:
+//
+// id(required): pass the exchange id(can be obtained from /exchanges/list) eg. binance.
+//
+// Query parameters:
+//
+// coin_ids(optional): filter tickers by coin_ids (ref: v3/coins/list).
+//
+// include_exchange_logo(optional): flag to show exchange_logo. Valid values: true, false.
+//
+// page(optional): page through results.
+//
+// depth(optional): flag to show 2% orderbook depth. i.e., cost_to_move_up_usd and cost_to_move_down_usd.
+// Valid values: true, false.
+//
+// order(optional): valid values: trust_score_desc (default), trust_score_asc and volume_desc.
+func (c *Client) ExchangesIDTickers(ctx context.Context, id, coinIDs string, includeExchangeLogo bool, page uint, depth bool,
+	order string) (*ExchangesIDTickersResponse, int, error) {
+	if id == "" {
+		return nil, -1, fmt.Errorf("id should not be empty")
+	}
+
+	params := url.Values{}
+	if coinIDs != "" {
+		params.Add("coin_ids", coinIDs)
+	}
+	params.Add("include_exchange_logo", strconv.FormatBool(includeExchangeLogo))
+	if page == 0 {
+		params.Add("page", "1")
+	} else {
+		params.Add("page", strconv.Itoa(int(page)))
+	}
+	params.Add("depth", strconv.FormatBool(depth))
+	if order != "" {
+		params.Add("order", order)
+	}
+
+	path := fmt.Sprintf(exchangesTickerPath, id)
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
+	resp, header, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to exchanges id tickers api", "error", err)
+		return nil, -1, err
+	}
+
+	total := header.Get("total")
+	totalInt, err := strconv.Atoi(total)
+	if err != nil {
+		slog.Error("failed to parse total http response header", "total", totalInt)
+		return nil, -1, err
+	}
+	pageCount := calculateTotalPages(totalInt, 100)
+
+	var data ExchangesIDTickersResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal exchanges id tickers response", "error", err)
+		return nil, -1, err
+	}
+	return &data, pageCount, nil
+}
+
+// ExchangesIDVolumeChart gets volume_chart data (in BTC) for a given exchange.
+//
+// Data granularity is automatic(cannot be adjusted):
+//
+// 1 day = 10-minutely.
+//
+// 2-90 days = hourly.
+//
+// 91 days above = daily.
+//
+// Note: exclusive endpoint is available for paid users to query more than 1 year of historical data.
+//
+// Cache/Update Frequency: every 60 seconds.
+//
+// Path parameters:
+//
+// id(required): pass the exchange id(can be obtained from /exchanges/list) eg. binance.
+//
+// Query parameters:
+//
+// days(required): data up to number of days ago (1/7/14/30/90/180/365).
+func (c *Client) ExchangesIDVolumeChart(ctx context.Context, id string, days uint) (*[]ExchangesIDVolumeChartResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("id should not be empty")
+	}
+
+	params := url.Values{}
+	params.Add("days", strconv.Itoa(int(days)))
+
+	path := fmt.Sprintf(exchangesVolumeChartPath, id)
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to exchanges id volume chart api", "error", err)
+		return nil, err
+	}
+
+	var data []ExchangesIDVolumeChartResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal exchanges id volume chart response", "error", err)
 		return nil, err
 	}
 	return &data, nil
