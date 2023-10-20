@@ -151,6 +151,35 @@ func TestClient_CoinsIDOHLC(t *testing.T) {
 	slog.Info("call CoinsIDOHLC successfully", "response data", len(*data))
 }
 
+func TestClient_CoinsContract(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.CoinsContract(context.Background(), "ethereum", "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call CoinsContract successfully", "response data", data.Name)
+}
+
+func TestClient_CoinsContractMarketChart(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.CoinsContractMarketChart(context.Background(), "ethereum", "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+		"usd", "1", "full")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call CoinsContract successfully", "response data", len(data.Prices))
+}
+
+func TestClient_CoinsContractMarketChartRange(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.CoinsContractMarketChartRange(context.Background(), "ethereum", "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+		"usd", "1682477232", "1682577232", "full")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call CoinsContractMarketChartRange successfully", "response data", len(data.Prices))
+}
+
 func TestClient_AssetPlatforms(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
 	data, err := api.AssetPlatforms(context.Background(), "")
