@@ -124,6 +124,33 @@ func TestClient_CoinsIDHistory(t *testing.T) {
 	slog.Info("call CoinsIDHistory successfully", "response data", data.Name)
 }
 
+func TestClient_CoinsIDMarketChart(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.CoinsIDMarketChart(context.Background(), "ethereum", "usd", "max", "daily", "full")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call CoinsIDMarketChart successfully", "response data", len(data.MarketCaps))
+}
+
+func TestClient_CoinsIDMarketChartRange(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.CoinsIDMarketChartRange(context.Background(), "ethereum", "usd", "1682477232", "1682577232", "full")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call CoinsIDMarketChartRange successfully", "response data", len(data.MarketCaps))
+}
+
+func TestClient_CoinsIDOHLC(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.CoinsIDOHLC(context.Background(), "ethereum", "usd", "1", "full")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call CoinsIDOHLC successfully", "response data", len(*data))
+}
+
 func TestClient_AssetPlatforms(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
 	data, err := api.AssetPlatforms(context.Background(), "")
