@@ -129,4 +129,26 @@ type CoinsIDMarketChartResponse struct {
 // CoinsOHLCResponse returned by CoinsOHLC API.
 // It consists of five elements: time in unix millisecond(int64), coins opening price(float64), high price(float64),
 // low price(float64) and closing price(float64).
-type CoinsOHLCResponse [5]json.Number
+type CoinsOHLCResponse [5]float64
+
+// CoinsContractResponse returned by CoinsContract API.
+type CoinsContractResponse struct {
+	CoinsIDResponse
+}
+
+// CoinsContractMarketChartResponse returned by CoinsContractMarketChart and CoinsContractMarketChartRange API.
+type CoinsContractMarketChartResponse struct {
+	CoinsIDMarketChartResponse
+}
+
+func computePageCount(total int) int {
+	if total <= 100 {
+		return 1
+	} else {
+		if total%100 == 0 {
+			return total / 100
+		} else {
+			return total/100 + 1
+		}
+	}
+}

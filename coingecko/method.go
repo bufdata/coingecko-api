@@ -453,7 +453,7 @@ func (c *Client) CoinsIDTickers(ctx context.Context, id, exchangeIDs string, inc
 		slog.Error("failed to parse total http response header", "total", totalInt)
 		return nil, -1, err
 	}
-	pageCount := totalInt/100 + 1
+	pageCount := computePageCount(totalInt)
 
 	var data CoinsIDTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
@@ -698,6 +698,177 @@ func (c *Client) CoinsIDOHLC(ctx context.Context, id, vsCurrency, days, precisio
 	var data []CoinsOHLCResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins ohlc response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// CoinsContract gets coin info from contract address.
+//
+// Cache/Update Frequency: every 60 seconds.
+//
+// Path parameters:
+//
+// id(required): asset platform (See asset_platforms endpoint for list of options).
+//
+// contract_address(required): token's contract address.
+func (c *Client) CoinsContract(ctx context.Context, id, contractAddress string) (*CoinsContractResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("id should not be empty")
+	}
+	if contractAddress == "" {
+		return nil, fmt.Errorf("contract address should not be empty")
+	}
+
+	path := fmt.Sprintf(coinsContractPath, id, contractAddress)
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, path)
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to coins contract api", "error", err)
+		return nil, err
+	}
+
+	var data CoinsContractResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal coins contract response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// CoinsContractMarketChart Get historical market data include price, market cap, and 24h volume (granularity auto)
+// from a contract address.
+//
+// Data granularity is automatic (cannot be adjusted):
+//
+// 1 day from current time = 5 minute interval data.
+//
+// 2-90 days from current time = hourly data.
+//
+// above 90 days from current time = daily data (00:00 UTC).
+//
+// Cache/Update Frequency: every 5 minutes.
+//
+// The last completed UTC day (00:00) is available 35 minutes after midnight on the next UTC day (00:35).
+//
+// Path parameters:
+//
+// id(required): asset platform (See asset_platforms endpoint for list of options).
+//
+// contract_address(required): token's contract address.
+//
+// Path parameters:
+//
+// vs_currency(required): the target currency of market data (usd, eur, jpy, etc.).
+//
+// days(required): data up to number of days ago (eg. 1,14,30,max).
+//
+// precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
+func (c *Client) CoinsContractMarketChart(ctx context.Context, id, contractAddress, vsCurrency, days, precision string) (
+	*CoinsContractMarketChartResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("id should not be empty")
+	}
+	if contractAddress == "" {
+		return nil, fmt.Errorf("contract address should not be empty")
+	}
+	if vsCurrency == "" {
+		return nil, fmt.Errorf("vs currency should not be empty")
+	}
+	if days == "" {
+		return nil, fmt.Errorf("days should not be empty")
+	}
+
+	params := url.Values{}
+	params.Add("vs_currency", vsCurrency)
+	params.Add("days", days)
+	if precision != "" {
+		params.Add("precision", precision)
+	}
+
+	path := fmt.Sprintf(coinsContractMarketChartPath, id, contractAddress)
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to coins contract market chart api", "error", err)
+		return nil, err
+	}
+
+	var data CoinsContractMarketChartResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal coins contract market chart response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// CoinsContractMarketChartRange Get historical market data include price, market cap, and 24h volume (granularity auto)
+// from a contract address.
+//
+// Data granularity is automatic (cannot be adjusted):
+//
+// 1 day from current time = 5 minute interval data.
+//
+// 2-90 days from current time = hourly data.
+//
+// above 90 days from current time = daily data (00:00 UTC).
+//
+// Cache/Update Frequency: every 5 minutes.
+//
+// The last completed UTC day (00:00) is available 35 minutes after midnight on the next UTC day (00:35).
+//
+// Path parameters:
+//
+// id(required): asset platform (See asset_platforms endpoint for list of options).
+//
+// contract_address(required): token's contract address.
+//
+// Path parameters:
+//
+// vs_currency(required): the target currency of market data (usd, eur, jpy, etc.).
+//
+// from(required): from date in UNIX Timestamp (eg. 1392577232).
+//
+// to(required): to date in UNIX Timestamp (eg. 1422577232).
+//
+// precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
+func (c *Client) CoinsContractMarketChartRange(ctx context.Context, id, contractAddress, vsCurrency, from, to,
+	precision string) (*CoinsContractMarketChartResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("id should not be empty")
+	}
+	if contractAddress == "" {
+		return nil, fmt.Errorf("contract address should not be empty")
+	}
+	if vsCurrency == "" {
+		return nil, fmt.Errorf("vs currency should not be empty")
+	}
+	if from == "" {
+		return nil, fmt.Errorf("from should not be empty")
+	}
+	if to == "" {
+		return nil, fmt.Errorf("to should not be empty")
+	}
+
+	params := url.Values{}
+	params.Add("vs_currency", vsCurrency)
+	params.Add("from", from)
+	params.Add("to", to)
+	if precision != "" {
+		params.Add("precision", precision)
+	}
+
+	path := fmt.Sprintf(coinsContractMarketChartRangePath, id, contractAddress)
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to coins contract market chart range api", "error", err)
+		return nil, err
+	}
+
+	var data CoinsContractMarketChartResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal coins contract market chart range response", "error", err)
 		return nil, err
 	}
 	return &data, nil

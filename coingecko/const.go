@@ -36,8 +36,8 @@ const (
 
 	// contract
 	coinsContractPath                 = "/coins/%s/contract/%s"
-	coinsContractMarketChartPath      = "/coins/%s/contract/%s/market_contract/"
-	coinsContractMarketChartRangePath = "/coins/%s/contract/%s/market_contract/range"
+	coinsContractMarketChartPath      = "/coins/%s/contract/%s/market_chart/"
+	coinsContractMarketChartRangePath = "/coins/%s/contract/%s/market_chart/range"
 
 	// asset platforms
 	assetPlatformsPath = "/asset_platforms"
