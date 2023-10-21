@@ -1347,3 +1347,87 @@ func (c *Client) DerivativesExchangesList(ctx context.Context) (*[]DerivativesEx
 	}
 	return &data, nil
 }
+
+// SearchTrending gets Top-7 trending coins on CoinGecko as searched by users in the last 24 hours(ordered by most
+// popular first).
+//
+// Cache/Update Frequency: every 10 minutes.
+func (c *Client) SearchTrending(ctx context.Context) (*SearchTrendingResponse, error) {
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, trendingPath)
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to search trending api", "error", err)
+		return nil, err
+	}
+
+	var data SearchTrendingResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal search trending response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// Global gets cryptocurrency global data.
+//
+// Cache/Update Frequency: every 10 minutes.
+func (c *Client) Global(ctx context.Context) (*GlobalResponse, error) {
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, globalPath)
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to global api", "error", err)
+		return nil, err
+	}
+
+	var data GlobalResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal global response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// GlobalDecentralizedFinanceDefi gets Top 100 Cryptocurrency Global Decentralized Finance(defi) data.
+//
+// Cache/Update Frequency: every 60 minutes.
+func (c *Client) GlobalDecentralizedFinanceDefi(ctx context.Context) (*GlobalDefiResponse, error) {
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, globalDefi)
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to global defi api", "error", err)
+		return nil, err
+	}
+
+	var data GlobalDefiResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal global defi response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// CompaniesPublicTreasury gets public companies bitcoin or ethereum holdings (Ordered by total holdings descending).
+//
+// Path parameters:
+//
+// coin_id(required): bitcoin or ethereum.
+func (c *Client) CompaniesPublicTreasury(ctx context.Context, coinID string) (*CompaniesPublicTreasuryResponse, error) {
+	if coinID == "" {
+		return nil, fmt.Errorf("coin id should be empty")
+	}
+
+	path := fmt.Sprintf(companiesPath, coinID)
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, path)
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to companies public treasury api", "error", err)
+		return nil, err
+	}
+
+	var data CompaniesPublicTreasuryResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal companies public treasury response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
