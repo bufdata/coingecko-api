@@ -232,30 +232,37 @@ type DerivativesExchangesTickersItem struct {
 	ExpiredAt            *int64            `json:"expired_at"`
 }
 
-// {
-//            "symbol": "1000PEPEUSDT",
-//            "base": "1000PEPE",
-//            "target": "USDT",
-//            "trade_url": "https://www.binance.com/en/futuresng/1000PEPEUSDT",
-//            "contract_type": "perpetual",
-//            "last": 0.001,
-//            "h24_percentage_change": 0.797,
-//            "index": 0.00065809,
-//            "index_basis_percentage": 0.029,
-//            "bid_ask_spread": 0.000152091254752773,
-//            "funding_rate": 0.01,
-//            "open_interest_usd": 0,
-//            "h24_volume": 144336978205,
-//            "converted_volume": {
-//                "btc": "3211.9778285661639852631999616806147185",
-//                "eth": "59388.76704733539053666348813555351523630026921485905",
-//                "usd": "94991756.858573879322190823841815100414694451212734"
-//            },
-//            "converted_last": {
-//                "btc": "0.0000000222533259911000225949561957",
-//                "eth": "0.00000041145912700892400213501814966553335039941",
-//                "usd": "0.0006581248827563666904342118919990251046748"
-//            },
-//            "last_traded": 1697865422,
-//            "expired_at": null
-//        },
+// CompaniesItem
+type CompaniesItem struct {
+	Name                    string  `json:"name"`
+	Symbol                  string  `json:"symbol"`
+	Country                 string  `json:"country"`
+	TotalHoldings           float64 `json:"total_holdings"`
+	TotalEntryValueUSD      float64 `json:"total_entry_value_usd"`
+	TotalCurrentValueUSD    float64 `json:"total_current_value_usd"`
+	PercentageOfTotalSupply float64 `json:"percentage_of_total_supply"`
+}
+
+type SearchTrendingCoinItem struct {
+	ID            string `json:"id"`
+	CoinID        int    `json:"coin_id"`
+	Name          string `json:"name"`
+	Symbol        string `json:"symbol"`
+	MarketCapRank int    `json:"market_cap_rank"`
+	ImageItem
+	Slug     string  `json:"slug"`
+	PriceBTC float64 `json:"price_btc"`
+	Score    int     `json:"score"`
+}
+
+// SearchTrendingNFTItem
+type SearchTrendingNFTItem struct {
+	ID                            string  `json:"id"`
+	Name                          string  `json:"name"`
+	Symbol                        string  `json:"symbol"`
+	Thumb                         string  `json:"thumb"`
+	NftContractID                 int     `json:"nft_contract_id"`
+	NativeCurrencySymbol          string  `json:"native_currency_symbol"`
+	FloorPriceInNativeCurrency    float64 `json:"floor_price_in_native_currency"`
+	FloorPrice24HPercentageChange float64 `json:"floor_price_24h_percentage_change"`
+}

@@ -226,17 +226,6 @@ func TestClient_ExchangesList(t *testing.T) {
 		log.Fatalln(err)
 	}
 	slog.Info("call ExchangesList successfully", "response data", len(*data))
-
-	b, err := json.Marshal(data)
-	if err != nil {
-		slog.Error("marshal error", "error", err)
-	}
-	err = os.WriteFile("./logs/exchanges_list.json", b, 0644)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("JSON文件已保存")
 }
 
 func TestClient_ExchangesID(t *testing.T) {
@@ -291,17 +280,6 @@ func TestClient_DerivativesExchangesID(t *testing.T) {
 		log.Fatalln(err)
 	}
 	slog.Info("call DerivativesExchanges successfully", "response data", (*data).Name)
-
-	b, err := json.Marshal(data)
-	if err != nil {
-		slog.Error("marshal error", "error", err)
-	}
-	err = os.WriteFile("./logs/derivatives_exchanges_id.json", b, 0644)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("JSON文件已保存")
 }
 
 func TestClient_DerivativesExchangesList(t *testing.T) {
@@ -311,15 +289,51 @@ func TestClient_DerivativesExchangesList(t *testing.T) {
 		log.Fatalln(err)
 	}
 	slog.Info("call DerivativesExchangesList successfully", "response data", len(*data))
+}
+
+func TestClient_SearchTrending(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.SearchTrending(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call SearchTrending successfully", "response data", data)
 
 	b, err := json.Marshal(data)
 	if err != nil {
 		slog.Error("marshal error", "error", err)
 	}
-	err = os.WriteFile("./logs/derivatives_exchanges_list.json", b, 0644)
+	err = os.WriteFile("./logs/search_trending.json", b, 0644)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println("JSON文件已保存")
+	fmt.Println("json file is saved")
+}
+
+func TestClient_Global(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.Global(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call Global successfully", "response data", data)
+}
+
+func TestClient_GlobalDecentralizedFinanceDefi(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.GlobalDecentralizedFinanceDefi(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call GlobalDecentralizedFinanceDefi successfully", "response data", data)
+}
+
+func TestClient_CompaniesPublicTreasury(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.CompaniesPublicTreasury(context.Background(), "ethereum")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call CompaniesPublicTreasury successfully", "response data", (*data).MarketCapDominance)
 }

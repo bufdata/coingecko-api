@@ -243,6 +243,52 @@ type DerivativesExchangesListResponse struct {
 	ID   string `json:"id"`
 }
 
+// CompaniesPublicTreasuryResponse returned by CompaniesPublicTreasury API.
+type CompaniesPublicTreasuryResponse struct {
+	TotalHoldings      float64         `json:"total_holdings"`
+	TotalValueUSD      float64         `json:"total_value_usd"`
+	MarketCapDominance float64         `json:"market_cap_dominance"`
+	Companies          []CompaniesItem `json:"companies"`
+}
+
+// GlobalDefiResponse returned by GlobalDefi API.
+type GlobalDefiResponse struct {
+	Data struct {
+		DefiMarketCap        string  `json:"defi_market_cap"`
+		EthMarketCap         string  `json:"eth_market_cap"`
+		DefiToEthRatio       string  `json:"defi_to_eth_ratio"`
+		TradingVolume24h     string  `json:"trading_volume_24h"`
+		DefiDominance        string  `json:"defi_dominance"`
+		TopCoinName          string  `json:"top_coin_name"`
+		TopCoinDefiDominance float64 `json:"top_coin_defi_dominance"`
+	} `json:"data"`
+}
+
+// GlobalResponse returned by Global API.
+type GlobalResponse struct {
+	Data struct {
+		ActiveCryptoCurrencies          int                `json:"active_crypto_currencies"`
+		UpcomingICOs                    int                `json:"upcoming_icos"`
+		OngoingICOs                     int                `json:"ongoing_icos"`
+		EndedICOs                       int                `json:"ended_icos"`
+		Markets                         int                `json:"markets"`
+		TotalMarketCap                  map[string]float64 `json:"total_market_cap"`
+		TotalVolume                     map[string]float64 `json:"total_volume"`
+		MarketCapPercentage             map[string]float64 `json:"market_cap_percentage"`
+		MarketCapChangePercentage24hUSD float64            `json:"market_cap_change_percentage_24h_usd"`
+		UpdatedAt                       int64              `json:"updated_at"`
+	} `json:"data"`
+}
+
+// SearchTrendingResponse returned by SearchTrending API.
+type SearchTrendingResponse struct {
+	Coins []struct {
+		SearchTrendingCoinItem `json:"item"`
+	} `json:"coins"`
+	NFTs      []struct{ SearchTrendingNFTItem }
+	Exchanges []any `json:"exchanges"`
+}
+
 func calculateTotalPages(totalCount, pageSize int) int {
 	return (totalCount + pageSize - 1) / pageSize
 }
