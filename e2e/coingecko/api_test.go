@@ -265,3 +265,61 @@ func TestClient_ExchangesIDVolumeChart(t *testing.T) {
 	}
 	slog.Info("call ExchangesIDVolumeChart successfully", "response data", len(*data))
 }
+
+func TestClient_Derivatives(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.Derivatives(context.Background(), "")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call Derivatives successfully", "response data", len(*data))
+}
+
+func TestClient_DerivativesExchanges(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, count, err := api.DerivativesExchanges(context.Background(), "", 0, 0)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call DerivativesExchanges successfully", "response data", len(*data), "count", count)
+}
+
+func TestClient_DerivativesExchangesID(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.DerivativesExchangesID(context.Background(), "binance_futures", "all")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call DerivativesExchanges successfully", "response data", (*data).Name)
+
+	b, err := json.Marshal(data)
+	if err != nil {
+		slog.Error("marshal error", "error", err)
+	}
+	err = os.WriteFile("./logs/derivatives_exchanges_id.json", b, 0644)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("JSON文件已保存")
+}
+
+func TestClient_DerivativesExchangesList(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.DerivativesExchangesList(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call DerivativesExchangesList successfully", "response data", len(*data))
+
+	b, err := json.Marshal(data)
+	if err != nil {
+		slog.Error("marshal error", "error", err)
+	}
+	err = os.WriteFile("./logs/derivatives_exchanges_list.json", b, 0644)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("JSON文件已保存")
+}

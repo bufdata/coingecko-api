@@ -33,7 +33,7 @@ type CoinsMarketsResponse struct {
 	Image                               string         `json:"image"`
 	CurrentPrice                        float64        `json:"current_price"`
 	MarketCap                           float64        `json:"market_cap"`
-	MarketCapRank                       int16          `json:"market_cap_rank"`
+	MarketCapRank                       int            `json:"market_cap_rank"`
 	FullyDilutedValuation               float64        `json:"fully_diluted_valuation"`
 	TotalVolume                         float64        `json:"total_volume"`
 	High24h                             float64        `json:"high_24h"`
@@ -69,7 +69,7 @@ type CoinsIDResponse struct {
 	AssetPlatformID              string                  `json:"asset_platform_id"`
 	Platforms                    *PlatformsItem          `json:"platforms"`
 	DetailPlatforms              *DetailPlatformsItem    `json:"detail_platforms"`
-	BlockTimeInMinutes           int32                   `json:"block_time_in_minutes"`
+	BlockTimeInMinutes           int64                   `json:"block_time_in_minutes"`
 	HashingAlgorithm             *string                 `json:"hashing_algorithm"`
 	Categories                   []string                `json:"categories"`
 	PreviewListing               bool                    `json:"preview_listing"`
@@ -86,8 +86,8 @@ type CoinsIDResponse struct {
 	SentimentVotesDownPercentage float64                 `json:"sentiment_votes_down_percentage"`
 	ICOData                      *ICODataItem            `json:"ico_data,omitempty"`
 	WatchlistPortfolioUsers      float64                 `json:"watchlist_portfolio_users"`
-	MarketCapRank                int16                   `json:"market_cap_rank"`
-	CoingeckoRank                int16                   `json:"coingecko_rank"`
+	MarketCapRank                int                     `json:"market_cap_rank"`
+	CoingeckoRank                int                     `json:"coingecko_rank"`
 	CoingeckoScore               float32                 `json:"coingecko_score"`
 	DeveloperScore               float32                 `json:"developer_score"`
 	CommunityScore               float32                 `json:"community_score"`
@@ -196,7 +196,52 @@ type ExchangesIDTickersResponse struct {
 
 // ExchangesIDVolumeChartResponse returned by ExchangesIDVolumeChart API.
 // It consists of two elements: one is time represents unix millisecond(int64); another is volume chart, type is string.
-type ExchangesIDVolumeChartResponse [2]any
+type ExchangesIDVolumeChartResponse [2]json.Number
+
+// DerivativesResponse returned by Derivatives API.
+type DerivativesResponse struct {
+	Market                   string  `json:"market"`
+	Symbol                   string  `json:"symbol"`
+	IndexID                  string  `json:"index_id"`
+	Price                    string  `json:"price"`
+	PricePercentageChange24h float64 `json:"price_percentage_change_24h"`
+	ContractType             string  `json:"contract_type"`
+	Index                    float64 `json:"index"`
+	Basis                    float64 `json:"basis"`
+	Spread                   float64 `json:"spread"`
+	FundingRate              float64 `json:"funding_rate"`
+	OpenInterest             float64 `json:"open_interest"`
+	Volume24h                float64 `json:"volume_24h"`
+	LastTradedAt             int64   `json:"last_traded_at"`
+	ExpiredAt                *int64  `json:"expired_at"`
+}
+
+// DerivativesExchangesResponse returned by DerivativesExchanges API.
+type DerivativesExchangesResponse struct {
+	Name                   string  `json:"name"`
+	ID                     string  `json:"id,omitempty"`
+	OpenInterestBTC        float64 `json:"open_interest_btc"`
+	TradeVolume24hBTC      string  `json:"trade_volume_24h_btc"`
+	NumberOfPerpetualPairs int     `json:"number_of_perpetual_pairs"`
+	NumberOfFuturesPairs   int     `json:"number_of_futures_pairs"`
+	Image                  string  `json:"image"`
+	YearEstablished        int     `json:"year_established"`
+	Country                *string `json:"country"`
+	Description            string  `json:"description"`
+	URL                    string  `json:"url"`
+}
+
+// DerivativesExchangesIDResponse returned by DerivativesExchangesID API.
+type DerivativesExchangesIDResponse struct {
+	DerivativesExchangesResponse
+	Tickers []DerivativesExchangesTickersItem `json:"tickers,omitempty"`
+}
+
+// DerivativesExchangesListResponse returned by DerivativesExchangesList API.
+type DerivativesExchangesListResponse struct {
+	Name string `json:"name"`
+	ID   string `json:"id"`
+}
 
 func calculateTotalPages(totalCount, pageSize int) int {
 	return (totalCount + pageSize - 1) / pageSize
