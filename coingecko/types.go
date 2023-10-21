@@ -73,7 +73,7 @@ type MarketDataItem struct {
 	AtlChangePercentage                    AllCurrencies      `json:"atl_change_percentage"`
 	AtlDate                                CurrenciesToDate   `json:"atl_date"`
 	MarketCap                              AllCurrencies      `json:"market_cap"`
-	MarketCapRank                          int16              `json:"market_cap_rank"`
+	MarketCapRank                          int                `json:"market_cap_rank"`
 	FullyDilutedValuation                  AllCurrencies      `json:"fully_diluted_valuation"`
 	MarketCapFdvRatio                      float32            `json:"market_cap_fdv_ratio"`
 	TotalVolume                            AllCurrencies      `json:"total_volume"`
@@ -110,7 +110,7 @@ type MarketDataItem struct {
 // CommunityDataItem describes community data.
 type CommunityDataItem struct {
 	FacebookLikes            *uint           `json:"facebook_likes"`
-	TwitterFollowers         int32           `json:"twitter_followers"`
+	TwitterFollowers         int             `json:"twitter_followers"`
 	RedditAveragePosts48h    float64         `json:"reddit_average_posts_48h"`
 	RedditAverageComments48h float64         `json:"reddit_average_comments_48h"`
 	RedditSubscribers        uint            `json:"reddit_subscribers"`
@@ -210,3 +210,52 @@ type StatusUpdatesItem struct {
 		Image ImageItem `json:"image"`
 	} `json:"project"`
 }
+
+// DerivativesExchangesTickersItem
+type DerivativesExchangesTickersItem struct {
+	Symbol               string            `json:"symbol"`
+	Base                 string            `json:"base"`
+	Target               string            `json:"target"`
+	TradeURL             string            `json:"trade_url"`
+	ContractType         string            `json:"contract_type"`
+	Last                 float64           `json:"last"`
+	H24PercentageChange  float64           `json:"h24_percentage_change"`
+	Index                float64           `json:"index"`
+	IndexBasisPercentage float64           `json:"index_basis_percentage"`
+	BidAskSpread         float64           `json:"bid_ask_spread"`
+	FundingRate          float64           `json:"funding_rate"`
+	OpenInterestUSD      float64           `json:"open_interest_usd"`
+	H24Volume            float64           `json:"h24_volume"`
+	ConvertedVolume      map[string]string `json:"converted_volume"`
+	ConvertedLast        map[string]string `json:"converted_last"`
+	LastTraded           int64             `json:"last_traded"`
+	ExpiredAt            *int64            `json:"expired_at"`
+}
+
+// {
+//            "symbol": "1000PEPEUSDT",
+//            "base": "1000PEPE",
+//            "target": "USDT",
+//            "trade_url": "https://www.binance.com/en/futuresng/1000PEPEUSDT",
+//            "contract_type": "perpetual",
+//            "last": 0.001,
+//            "h24_percentage_change": 0.797,
+//            "index": 0.00065809,
+//            "index_basis_percentage": 0.029,
+//            "bid_ask_spread": 0.000152091254752773,
+//            "funding_rate": 0.01,
+//            "open_interest_usd": 0,
+//            "h24_volume": 144336978205,
+//            "converted_volume": {
+//                "btc": "3211.9778285661639852631999616806147185",
+//                "eth": "59388.76704733539053666348813555351523630026921485905",
+//                "usd": "94991756.858573879322190823841815100414694451212734"
+//            },
+//            "converted_last": {
+//                "btc": "0.0000000222533259911000225949561957",
+//                "eth": "0.00000041145912700892400213501814966553335039941",
+//                "usd": "0.0006581248827563666904342118919990251046748"
+//            },
+//            "last_traded": 1697865422,
+//            "expired_at": null
+//        },

@@ -966,15 +966,13 @@ func (c *Client) CoinsCategories(ctx context.Context, order string) (*[]CoinsCat
 func (c *Client) Exchanges(ctx context.Context, perPage, page uint) (*[]ExchangesResponse, int, error) {
 	params := url.Values{}
 	if perPage == 0 {
-		params.Add("per_page", strconv.Itoa(100))
-	} else {
-		params.Add("per_page", strconv.Itoa(int(perPage)))
+		perPage = 100
 	}
+	params.Add("per_page", strconv.Itoa(int(perPage)))
 	if page == 0 {
-		params.Add("page", strconv.Itoa(1))
-	} else {
-		params.Add("page", strconv.Itoa(int(page)))
+		page = 1
 	}
+	params.Add("page", strconv.Itoa(int(page)))
 
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, exchangesPath, params.Encode())
 	fmt.Println(endpoint)
@@ -990,7 +988,7 @@ func (c *Client) Exchanges(ctx context.Context, perPage, page uint) (*[]Exchange
 		slog.Error("failed to parse total http response header", "total", totalInt)
 		return nil, -1, err
 	}
-	pageCount := calculateTotalPages(totalInt, 100)
+	pageCount := calculateTotalPages(totalInt, int(perPage))
 
 	var data []ExchangesResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
@@ -1191,6 +1189,160 @@ func (c *Client) ExchangesIDVolumeChart(ctx context.Context, id string, days uin
 	var data []ExchangesIDVolumeChartResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal exchanges id volume chart response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// Derivatives lists all derivative tickers.
+//
+// Note: 'open_interest' and 'volume_24h' data are in USD.
+//
+// Cache/Update Frequency: every 30 seconds.
+//
+// Query parameters:
+//
+// include_tickers(optional): ['all', 'unexpired'] - expired to show unexpired tickers, all to list all tickers;
+// defaults to unexpired.
+func (c *Client) Derivatives(ctx context.Context, includeTickers string) (*[]DerivativesResponse, error) {
+	params := url.Values{}
+	if includeTickers == "" {
+		params.Add("include_tickers", "unexpired")
+	} else {
+		params.Add("include_tickers", includeTickers)
+	}
+
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, derivativesPath, params.Encode())
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to derivatives api", "error", err)
+		return nil, err
+	}
+
+	var data []DerivativesResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal derivatives response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// DerivativesExchanges lists all derivative exchanges.
+//
+// Cache/Update Frequency: every 30 seconds.
+//
+// Query parameters:
+//
+// order(optional): order results using following params name_asc，name_desc，open_interest_btc_asc，
+// open_interest_btc_desc，trade_volume_24h_btc_asc，trade_volume_24h_btc_desc.
+//
+// per_page: total results per page.
+//
+// page(optional): page through results.
+func (c *Client) DerivativesExchanges(ctx context.Context, order string, perPage, page uint) (
+	*[]DerivativesExchangesResponse, int, error) {
+	params := url.Values{}
+	if order == "" {
+		params.Add("order", "open_interest_btc_desc")
+	} else {
+		params.Add("order", order)
+	}
+	if perPage == 0 {
+		perPage = 50
+	}
+	params.Add("per_page", strconv.Itoa(int(perPage)))
+	if page == 0 {
+		page = 1
+	}
+	params.Add("page", strconv.Itoa(int(page)))
+
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, derivativesExchangesPath, params.Encode())
+	resp, header, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to derivatives exchanges api", "error", err)
+		return nil, -1, err
+	}
+
+	total := header.Get("total")
+	totalInt, err := strconv.Atoi(total)
+	if err != nil {
+		slog.Error("failed to parse total http response header", "total", totalInt)
+		return nil, -1, err
+	}
+	pageCount := calculateTotalPages(totalInt, int(perPage))
+
+	var data []DerivativesExchangesResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal derivatives exchanges response", "error", err)
+		return nil, -1, err
+	}
+	return &data, pageCount, nil
+}
+
+// DerivativesExchangesID shows derivative exchange data.
+//
+// Dictionary:
+//
+// [last]: latest unconverted price in the respective pair target currency.
+// [volume]: unconverted 24h trading volume in the respective pair target currency.
+// [converted_last]: latest converted price in BTC, ETH, and USD.
+// [converted_volume]: converted 24h trading volume in BTC, ETH, and USD.
+//
+// Cache/Update Frequency: every 30 seconds.
+//
+// Path parameters:
+//
+// id: pass the exchange id (can be obtained from derivatives/exchanges/list) eg. bitmex.
+//
+// Query parameters:
+//
+// include_tickers(optional): ['all', 'unexpired'] - expired to show unexpired tickers, all to list all tickers,
+// leave blank to omit tickers data in response.
+func (c *Client) DerivativesExchangesID(ctx context.Context, id, includeTickers string) (*DerivativesExchangesIDResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("id should not be empty")
+	}
+
+	params := url.Values{}
+	if includeTickers != "" {
+		params.Add("include_tickers", includeTickers)
+	}
+
+	path := fmt.Sprintf(derivativesIDPath, id)
+	var endpoint string
+	if len(params) != 0 {
+		endpoint = fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
+	} else {
+		endpoint = fmt.Sprintf("%s%s", c.apiURL, path)
+	}
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to derivatives exchanges id api", "error", err)
+		return nil, err
+	}
+
+	var data DerivativesExchangesIDResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal derivatives exchanges id response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// DerivativesExchangesList lists all derivative exchanges name and identifier.
+//
+// Cache/Update Frequency: every 5 minutes.
+func (c *Client) DerivativesExchangesList(ctx context.Context) (*[]DerivativesExchangesListResponse, error) {
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, derivativesListPath)
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to derivatives exchanges list api", "error", err)
+		return nil, err
+	}
+
+	var data []DerivativesExchangesListResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal derivatives exchanges list response", "error", err)
 		return nil, err
 	}
 	return &data, nil
