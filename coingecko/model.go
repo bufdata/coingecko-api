@@ -289,6 +289,73 @@ type SearchTrendingResponse struct {
 	Exchanges []any `json:"exchanges"`
 }
 
+// SearchResponse returned by Search API.
+type SearchResponse struct {
+	Coins      []SearchCoinsItem      `json:"coins"`
+	Exchanges  []SearchExchangesItem  `json:"exchanges"`
+	ICOs       []any                  `json:"icos"`
+	Categories []SearchCategoriesItem `json:"categories"`
+	NFTs       []SearchNFTsItem       `json:"nfts"`
+}
+
+// ExchangeRatesResponse returned by ExchangeRates API.
+type ExchangeRatesResponse struct {
+	Rates map[string]ExchangeRatesItem `json:"rates"`
+}
+
+// NFTsListResponse returned by NFTsList API.
+type NFTsListResponse struct {
+	ID              string `json:"id"`
+	ContractAddress string `json:"contract_address"`
+	Name            string `json:"name"`
+	AssetPlatformID string `json:"asset_platform_id"`
+	Symbol          string `json:"symbol"`
+}
+
+// NFTsIDResponse returned by NFTsID or NFTsContract API.
+// TODO: FloorPrice24hPercentageChange, MarketCap24hPercentageChange, Volume24hPercentageChange,FloorPrice7dPercentageChange,
+// FloorPrice14dPercentageChange,FloorPrice30dPercentageChange,FloorPrice1yPercentageChange type is NativeCurrencyUSDItem;
+// but in golang cannot unmarshal them into {} when they are empty.
+type NFTsIDResponse struct {
+	ID              string `json:"id"`
+	ContractAddress string `json:"contract_address"`
+	AssetPlatformID string `json:"asset_platform_id"`
+	Name            string `json:"name"`
+	Symbol          string `json:"symbol"`
+	Image           struct {
+		Small string `json:"small"`
+	} `json:"image"`
+	Description                                string                `json:"description"`
+	NativeCurrency                             string                `json:"native_currency"`
+	NativeCurrencySymbol                       string                `json:"native_currency_symbol"`
+	FloorPrice                                 NativeCurrencyUSDItem `json:"floor_price"`
+	MarketCap                                  NativeCurrencyUSDItem `json:"market_cap"`
+	Volume24h                                  NativeCurrencyUSDItem `json:"volume_24h"`
+	FloorPriceInUSD24hPercentageChange         float64               `json:"floor_price_in_usd_24h_percentage_change"`
+	FloorPrice24hPercentageChange              *map[string]any       `json:"floor_price_24h_percentage_change"`
+	MarketCap24hPercentageChange               *map[string]any       `json:"market_cap_24h_percentage_change"`
+	Volume24hPercentageChange                  *map[string]any       `json:"volume_24h_percentage_change"`
+	NumberOfUniqueAddresses                    float64               `json:"number_of_unique_addresses"`
+	NumberOfUniqueAddresses24hPercentageChange float64               `json:"number_of_unique_addresses_24h_percentage_change"`
+	VolumeInUSD24hPercentageChange             float64               `json:"volume_in_usd_24h_percentage_change"`
+	TotalSupply                                float64               `json:"total_supply"`
+	OneDaySales                                float64               `json:"one_day_sales"`
+	OneDaySales24hPercentageChange             float64               `json:"one_day_sales_24h_percentage_change"`
+	OneDayAverageSalePrice                     float64               `json:"one_day_average_sale_price"`
+	OneDayAverageSalePrice24hPercentageChange  float64               `json:"one_day_average_sale_price_24h_percentage_change"`
+	Links                                      struct {
+		Homepage *string `json:"homepage"`
+		Twitter  *string `json:"twitter"`
+		Discord  *string `json:"discord"`
+	} `json:"links"`
+	FloorPrice7dPercentageChange  *map[string]any `json:"floor_price_7d_percentage_change"`
+	FloorPrice14dPercentageChange *map[string]any `json:"floor_price_14d_percentage_change"`
+	FloorPrice30dPercentageChange *map[string]any `json:"floor_price_30d_percentage_change"`
+	FloorPrice60dPercentageChange *map[string]any `json:"floor_price_60d_percentage_change"`
+	FloorPrice1yPercentageChange  *map[string]any `json:"floor_price_1y_percentage_change"`
+	Explorers                     []ExplorerItem  `json:"explorers"`
+}
+
 func calculateTotalPages(totalCount, pageSize int) int {
 	return (totalCount + pageSize - 1) / pageSize
 }

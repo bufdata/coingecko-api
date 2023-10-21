@@ -266,3 +266,56 @@ type SearchTrendingNFTItem struct {
 	FloorPriceInNativeCurrency    float64 `json:"floor_price_in_native_currency"`
 	FloorPrice24HPercentageChange float64 `json:"floor_price_24h_percentage_change"`
 }
+
+// SearchCoinsItem
+type SearchCoinsItem struct {
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	APISymbol     string `json:"api_symbol"`
+	Symbol        string `json:"symbol"`
+	MarketCapRank *int   `json:"market_cap_rank"`
+	Thumb         string `json:"thumb"`
+	Large         string `json:"large"`
+}
+
+// SearchExchangesItem
+type SearchExchangesItem struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	MarketType string `json:"market_type"`
+	Thumb      string `json:"thumb"`
+	Large      string `json:"large"`
+}
+
+// SearchCategoriesItem
+type SearchCategoriesItem struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+// SearchNFTsItem
+type SearchNFTsItem struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Symbol string `json:"symbol"`
+	Thumb  string `json:"thumb"`
+}
+
+// ExchangeRatesItemStruct
+type ExchangeRatesItem struct {
+	Name  string  `json:"name"`
+	Unit  string  `json:"unit"`
+	Value float64 `json:"value"`
+	Type  string  `json:"type"`
+}
+
+// NativeCurrencyUSDItem used for NFTsIDResponse.
+type NativeCurrencyUSDItem struct {
+	NativeCurrency float64 `json:"native_currency"`
+	USD            float64 `json:"usd"`
+}
+
+type ExplorerItem struct {
+	Name string `json:"name"`
+	Link string `json:"link"`
+}

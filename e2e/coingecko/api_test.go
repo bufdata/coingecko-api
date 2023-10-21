@@ -291,6 +291,73 @@ func TestClient_DerivativesExchangesList(t *testing.T) {
 	slog.Info("call DerivativesExchangesList successfully", "response data", len(*data))
 }
 
+func TestClient_NFTsList(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, count, err := api.NFTsList(context.Background(), "", "", 0, 0)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call NFTsList successfully", "response data", data, "count", count)
+
+	b, err := json.Marshal(data)
+	if err != nil {
+		slog.Error("marshal error", "error", err)
+	}
+	err = os.WriteFile("./logs/nfts_list.json", b, 0644)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("json file is saved")
+}
+
+func TestClient_NFTsID(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.NFTsID(context.Background(), "ag3dnft")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call NFTsID successfully", "response data", data)
+
+	b, err := json.Marshal(data)
+	if err != nil {
+		slog.Error("marshal error", "error", err)
+	}
+	err = os.WriteFile("./logs/nfts_id.json", b, 0644)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("json file is saved")
+}
+
+func TestClient_NFTsContract(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.NFTsContract(context.Background(), "binance-smart-chain", "0x4bafc595a9ff4a5f4936689a0389c148a65456a2")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call NFTsContract successfully", "response data", data)
+}
+
+func TestClient_ExchangeRates(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.ExchangeRates(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call ExchangeRates successfully", "response data", data)
+}
+
+func TestClient_Search(t *testing.T) {
+	api := coingecko.NewCoinGecko(emptyString, nil)
+	data, err := api.Search(context.Background(), "bnb")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	slog.Info("call Search successfully", "response data", data)
+}
+
 func TestClient_SearchTrending(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
 	data, err := api.SearchTrending(context.Background())
@@ -298,17 +365,6 @@ func TestClient_SearchTrending(t *testing.T) {
 		log.Fatalln(err)
 	}
 	slog.Info("call SearchTrending successfully", "response data", data)
-
-	b, err := json.Marshal(data)
-	if err != nil {
-		slog.Error("marshal error", "error", err)
-	}
-	err = os.WriteFile("./logs/search_trending.json", b, 0644)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("json file is saved")
 }
 
 func TestClient_Global(t *testing.T) {
