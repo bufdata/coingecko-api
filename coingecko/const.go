@@ -43,8 +43,8 @@ const (
 	assetPlatformsPath = "/asset_platforms"
 
 	// categories
-	categoriesListPath = "/coins/categories/list"
-	categoriesPath     = "/coins/categories"
+	coinsCategoriesListPath = "/coins/categories/list"
+	coinsCategoriesPath     = "/coins/categories"
 
 	// exchanges
 	exchangesPath            = "/exchanges"

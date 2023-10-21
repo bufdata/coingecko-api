@@ -97,7 +97,7 @@ type CoinsIDResponse struct {
 	CommunityData                *CommunityDataItem      `json:"community_data,omitempty"`
 	DeveloperData                *DeveloperDataItem      `json:"developer_data,omitempty"`
 	PublicInterestStats          PublicInterestStatsItem `json:"public_interest_stats"`
-	StatusUpdates                json.RawMessage         `json:"status_updates"`
+	StatusUpdates                StatusUpdatesItem       `json:"status_updates"`
 	LastUpdated                  time.Time               `json:"last_updated"`
 	Tickers                      *[]TickersItem          `json:"tickers,omitempty"`
 }
@@ -141,14 +141,63 @@ type CoinsContractMarketChartResponse struct {
 	CoinsIDMarketChartResponse
 }
 
-func computePageCount(total int) int {
-	if total <= 100 {
-		return 1
-	} else {
-		if total%100 == 0 {
-			return total / 100
-		} else {
-			return total/100 + 1
-		}
-	}
+// CoinsCategoriesListResponse returned by CoinsCategoriesList API.
+type CoinsCategoriesListResponse struct {
+	CategoryID string `json:"category_id"`
+	Name       string `json:"name"`
+}
+
+// CoinsCategoriesResponse returned by CoinsCategories API.
+type CoinsCategoriesResponse struct {
+	ID                 string     `json:"id"`
+	Name               string     `json:"name"`
+	MarketCap          *float64   `json:"market_cap"`
+	MarketCapChange24h *float64   `json:"market_cap_change_24_h"`
+	Content            string     `json:"content"`
+	Top3Coins          []string   `json:"top_3_coins"`
+	Volume24h          *float64   `json:"volume_24h"`
+	UpdatedAt          *time.Time `json:"updated_at"`
+}
+
+// ExchangesResponse returned by Exchanges API.
+type ExchangesResponse struct {
+	ID string `json:"id"`
+	ExchangesItem
+}
+
+// ExchangesListResponse returned by ExchangesList API.
+type ExchangesListResponse struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// ExchangesIDResponse returned by ExchangesID API.
+type ExchangesIDResponse struct {
+	ExchangesItem
+	FacebookURL   string              `json:"facebook_url"`
+	RedditURL     string              `json:"reddit_url"`
+	TelegramURL   string              `json:"telegram_url"`
+	SlackURL      string              `json:"slack_url"`
+	OtherURL1     string              `json:"other_url_1"`
+	OtherURL2     string              `json:"other_url_2"`
+	TwitterHandle string              `json:"twitter_handle"`
+	Centralized   bool                `json:"centralized"`
+	PublicNotice  string              `json:"public_notice"`
+	AlertNotice   string              `json:"alert_notice"`
+	Tickers       []TickersItem       `json:"tickers"`
+	StatusUpdates []StatusUpdatesItem `json:"status_updates"`
+}
+
+// ExchangesIDTickersResponse returned by ExchangesIDTickers API.
+type ExchangesIDTickersResponse struct {
+	Name    string
+	Tickers []TickersItem `json:"tickers"`
+}
+
+// ExchangesIDVolumeChartResponse returned by ExchangesIDVolumeChart API.
+// It consists of two elements: one is time represents unix millisecond(int64); another is volume chart, type is string.
+type ExchangesIDVolumeChartResponse [2]any
+
+func calculateTotalPages(totalCount, pageSize int) int {
+	return (totalCount + pageSize - 1) / pageSize
 }

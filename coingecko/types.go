@@ -179,3 +179,34 @@ type MarketDataForHistory struct {
 
 // ChartItem
 type ChartItem [2]float64
+
+// ExchangesItem
+type ExchangesItem struct {
+	Name                        string  `json:"name"`
+	YearEstablished             *int    `json:"year_established"`
+	Country                     *string `json:"country"`
+	Description                 string  `json:"description"`
+	URL                         string  `json:"url"`
+	Image                       string  `json:"image"`
+	HasTradingIncentive         *bool   `json:"has_trading_incentive"`
+	TrustScore                  float32 `json:"trust_score"`
+	TrustScoreRank              uint    `json:"trust_score_rank"`
+	TradeVolume24hBTC           float64 `json:"trade_volume_24h_btc"`
+	TradeVolume24hBTCNormalized float64 `json:"trade_volume_24h_btc_normalized"`
+}
+
+// StatusUpdatesItem
+type StatusUpdatesItem struct {
+	Description string    `json:"description"`
+	Category    string    `json:"category"`
+	CreatedAt   time.Time `json:"created_at"`
+	User        string    `json:"user"`
+	UserTitle   string    `json:"user_title"`
+	Pin         bool      `json:"pin"`
+	Project     struct {
+		Type  string    `json:"type"`
+		ID    string    `json:"id"`
+		Name  string    `json:"name"`
+		Image ImageItem `json:"image"`
+	} `json:"project"`
+}
