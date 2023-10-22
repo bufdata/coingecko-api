@@ -319,3 +319,26 @@ type ExplorerItem struct {
 	Name string `json:"name"`
 	Link string `json:"link"`
 }
+
+// TopGainerLosersItem used for CoinsTopGainersLosersResponse.
+type TopGainerLosersItem struct {
+	coinsStruct
+	Image         string  `json:"image"`
+	MarketCapRank *int64  `json:"market_cap_rank"`
+	USD           float64 `json:"usd"`
+	USD24hVol     float64 `json:"usd_24h_vol"`
+	USD1hChange   float64 `json:"usd_1h_change"`
+}
+
+// NFTsIDTickersItem used for NFTsIDTickersResponse.
+type NFTsIDTickersItem struct {
+	FloorPriceInNativeCurrency float64   `json:"floor_price_in_native_currency"`
+	H24VolumeInNativeCurrency  float64   `json:"h24_volume_in_native_currency"`
+	NativeCurrency             string    `json:"native_currency"`
+	UpdatedAt                  time.Time `json:"updated_at"`
+	NFTMarketplaceID           string    `json:"nft_marketplace_id"`
+}
+
+type ExchangesIDVolumeChartRangeItem struct {
+	float64
+}
