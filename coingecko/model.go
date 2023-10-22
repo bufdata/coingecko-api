@@ -356,6 +356,61 @@ type NFTsIDResponse struct {
 	Explorers                     []ExplorerItem  `json:"explorers"`
 }
 
+// CoinsListNewResponse returned by CoinsListNew API.
+type CoinsListNewResponse struct {
+	coinsStruct
+	ActivatedAt int64 `json:"activated_at"`
+}
+
+// CoinsTopGainersLosersResponse returned by CoinsTopGainersLosers API.
+type CoinsTopGainersLosersResponse struct {
+	TopGainers []struct{ TopGainerLosersItem } `json:"top_gainers"`
+	TopLosers  []struct{ TopGainerLosersItem } `json:"top_losers"`
+}
+
+// GlobalMarketCapChartResponse returned by GlobalMarketCapChart API.
+type GlobalMarketCapChartResponse struct {
+	MarketCapChart struct {
+		MarketCap []ChartItem `json:"market_cap"`
+		Volume    []ChartItem `json:"volume"`
+	} `json:"market_cap_chart"`
+}
+
+// NFTsMarketsResponse returned by NFTsMarkets API.
+type NFTsMarketsResponse struct {
+	ID              string `json:"id"`
+	ContractAddress string `json:"contract_address"`
+	AssetPlatformID string `json:"asset_platform_id"`
+	Name            string `json:"name"`
+	Image           struct {
+		Small string `json:"small"`
+	} `json:"image"`
+	Description                                string                `json:"description"`
+	NativeCurrency                             string                `json:"native_currency"`
+	FloorPrice                                 NativeCurrencyUSDItem `json:"floor_price"`
+	MarketCap                                  NativeCurrencyUSDItem `json:"market_cap"`
+	Volume24h                                  NativeCurrencyUSDItem `json:"volume_24h"`
+	FloorPriceInUSD24hPercentageChange         float64               `json:"floor_price_in_usd_24h_percentage_change"`
+	NumberOfUniqueAddresses                    float64               `json:"number_of_unique_addresses"`
+	NumberOfUniqueAddresses24hPercentageChange float64               `json:"number_of_unique_addresses_24h_percentage_change"`
+	TotalSupply                                float64               `json:"total_supply"`
+}
+
+// NFTsIDMarketChartResponse returned by NFTsIDMarketChart or NFTsContractMarketChart API.
+type NFTsIDMarketChartResponse struct {
+	FloorPriceUSD    []ChartItem `json:"floor_price_usd"`
+	FloorPriceNative []ChartItem `json:"floor_price_native"`
+	H24VolumeUSD     []ChartItem `json:"h24_volume_usd"`
+	H24VolumeNative  []ChartItem `json:"h24_volume_native"`
+	MarketCapUSD     []ChartItem `json:"market_cap_usd"`
+	MarketCapNative  []ChartItem `json:"market_cap_native"`
+}
+
+// NFTsIDTickersResponse returned by NFTsIDTickers API.
+type NFTsIDTickersResponse struct {
+	Tickers []struct{ NFTsIDTickersItem } `json:"tickers"`
+}
+
 func calculateTotalPages(totalCount, pageSize int) int {
 	return (totalCount + pageSize - 1) / pageSize
 }
