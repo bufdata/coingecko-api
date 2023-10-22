@@ -411,6 +411,27 @@ type NFTsIDTickersResponse struct {
 	Tickers []struct{ NFTsIDTickersItem } `json:"tickers"`
 }
 
+// CoinsIDCirculatingSupplyChartResponse returned by CoinsIDCirculatingSupplyChart API.
+type CoinsIDCirculatingSupplyChartResponse struct {
+	CirculatingSupply []struct {
+		CoinsIDCirculatingSupplyChartItem
+	} `json:"circulating_supply"`
+}
+
+// TokensListAllResponse returned by TokensListAll API.
+type TokensListAllResponse struct {
+	Name      string              `json:"name"`
+	LogoURI   string              `json:"logoURI"`
+	Keywords  []string            `json:"keywords"`
+	Timestamp time.Time           `json:"timestamp"`
+	Tokens    []TokensListAllItem `json:"tokens"`
+	Version   struct {
+		Major int `json:"major"`
+		Minor int `json:"minor"`
+		Patch int `json:"patch"`
+	} `json:"version"`
+}
+
 func calculateTotalPages(totalCount, pageSize int) int {
 	return (totalCount + pageSize - 1) / pageSize
 }
