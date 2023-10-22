@@ -339,6 +339,24 @@ type NFTsIDTickersItem struct {
 	NFTMarketplaceID           string    `json:"nft_marketplace_id"`
 }
 
-type ExchangesIDVolumeChartRangeItem struct {
-	float64
+// CoinsIDCirculatingSupplyChartItem used for CoinsIDCirculatingSupplyChartResponse.
+type CoinsIDCirculatingSupplyChartItem [2]json.Number
+
+// TokensListAllItem used for TokensListAllResponse.
+type TokensListAllItem struct {
+	ChainID  int    `json:"chainId"`
+	Address  string `json:"address"`
+	Name     string `json:"name"`
+	Symbol   string `json:"symbol"`
+	Decimals int    `json:"decimals"`
+	LogoURI  string `json:"logoURI"`
 }
+
+// {
+//            "chainId": 137,
+//            "address": "0x52468c88e8b4f5bcca20a6a7813355637dc5e3ad",
+//            "name": "Power Of Deep Ocean",
+//            "symbol": "PODO",
+//            "decimals": 18,
+//            "logoURI": "https://assets.coingecko.com/coins/images/27645/thumb/PODO_TICKER_200.png?1665020330"
+//        },

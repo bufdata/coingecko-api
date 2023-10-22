@@ -291,7 +291,7 @@ func (c *Client) NFTsIDTickers(ctx context.Context, id string) (*NFTsIDTickersRe
 	}
 
 	path := fmt.Sprintf(nftsTickersPath, id)
-	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path)
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, path)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
 		slog.Error("failed to send request to nfts id tickers api", "error", err)
@@ -341,7 +341,7 @@ func (c *Client) ExchangesIDVolumeChartRange(ctx context.Context, id string, fro
 	params.Add("to", strconv.Itoa(int(to)))
 
 	path := fmt.Sprintf(exchangesVolumeChartPath, id)
-	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path)
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
 		slog.Error("failed to send request to exchanges id volume chart range api", "error", err)
