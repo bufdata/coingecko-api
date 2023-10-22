@@ -1348,6 +1348,178 @@ func (c *Client) DerivativesExchangesList(ctx context.Context) (*[]DerivativesEx
 	return &data, nil
 }
 
+// NFTsList lists all supported NFT ids, paginated by 100 items per page, paginated to 100 items.
+//
+// Use this to obtain all the NFT ids in order to make API calls, paginated to 100 items.
+//
+// Cache/Update Frequency: every 5 minutes.
+//
+// Query parameters:
+//
+// order(optional): valid values: h24_volume_native_asc, h24_volume_native_desc, floor_price_native_asc, floor_price_native_desc,
+// market_cap_native_asc, market_cap_native_desc, market_cap_usd_asc, market_cap_usd_desc.
+//
+// asset_platform_id(optional): the id of the platform issuing tokens(see asset_platforms endpoint for list of options).
+//
+// per_page(optional): valid values: 1..250; total results per page; example: 100.
+//
+// page(optional): page through results; example: 1.
+func (c *Client) NFTsList(ctx context.Context, order, assetPlatformID string, perPage, page uint) (*[]NFTsListResponse, int, error) {
+	params := url.Values{}
+	if order != "" {
+		params.Add("order", order)
+	}
+	if assetPlatformID != "" {
+		params.Add("asset_platform_id", assetPlatformID)
+	}
+	if perPage == 0 {
+		perPage = 100
+	}
+	params.Add("per_page", strconv.Itoa(int(perPage)))
+	if page == 0 {
+		page = 1
+	}
+	params.Add("page", strconv.Itoa(int(page)))
+
+	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, nftsListPath, params.Encode())
+	resp, header, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to nfts list api", "error", err)
+		return nil, -1, err
+	}
+
+	total := header.Get("total")
+	totalInt, err := strconv.Atoi(total)
+	if err != nil {
+		slog.Error("failed to parse total http response header", "total", totalInt)
+		return nil, -1, err
+	}
+	pageCount := calculateTotalPages(totalInt, int(perPage))
+
+	var data []NFTsListResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal nfts list response", "error", err)
+		return nil, -1, err
+	}
+	return &data, pageCount, nil
+}
+
+// NFTsID gets current data (name, price_floor, volume_24h ...) for an NFT collection. native_currency (string) is
+// only a representative of the currency.
+//
+// Cache/Update Frequency: every 60 seconds.
+//
+// Path parameters:
+//
+// id(required): id of nft collection (can be obtained from /nfts/list).
+func (c *Client) NFTsID(ctx context.Context, id string) (*NFTsIDResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("id should not be empty")
+	}
+
+	path := fmt.Sprintf(nftsIDPath, id)
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, path)
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to nfts id api", "error", err)
+		return nil, err
+	}
+
+	var data NFTsIDResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal nfts id response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// NFTsContract gets current data (name, price_floor, volume_24h ...) for an NFT collection.
+// *Solana NFT & Art Blocks are not supported for this endpoint, please use /nfts/{id} endpoint instead.
+//
+// Cache/Update Frequency: every 60 seconds.
+//
+// Path parameters:
+//
+// asset_platform_id(required): the id of the platform issuing tokens (see asset_platforms endpoint for list of
+// options, use filter=nft param).
+//
+// contract_address(required): the contract_address of the nft collection (/nfts/list for list of nft collection with metadata).
+func (c *Client) NFTsContract(ctx context.Context, assetPlatformID, contractAddress string) (*NFTsIDResponse, error) {
+	if assetPlatformID == "" {
+		return nil, fmt.Errorf("asset_platform_id should not be empty")
+	}
+	if contractAddress == "" {
+		return nil, fmt.Errorf("contract_address should not be empty")
+	}
+
+	path := fmt.Sprintf(nftsContractPath, assetPlatformID, contractAddress)
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, path)
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to nfts contract api", "error", err)
+		return nil, err
+	}
+
+	var data NFTsIDResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal nfts contract response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// ExchangeRates gets BTC-to-Currency exchange rates.
+//
+// Cache/Update Frequency: every 60 seconds.
+func (c *Client) ExchangeRates(ctx context.Context) (*ExchangeRatesResponse, error) {
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, exchangeRatesPath)
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to exchange rates api", "error", err)
+		return nil, err
+	}
+
+	var data ExchangeRatesResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal exchange rates response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// Search for coins, categories and markets listed on CoinGecko ordered by largest Market Cap first.
+//
+// Cache/Update Frequency: every 15 minutes.
+//
+// Query parameters:
+//
+// query(optional): search string.
+func (c *Client) Search(ctx context.Context, query string) (*SearchResponse, error) {
+	params := url.Values{}
+	if query != "" {
+		params.Add("query", query)
+	}
+
+	var endpoint string
+	if len(params) != 0 {
+		endpoint = fmt.Sprintf("%s%s?%s", c.apiURL, searchPath, params.Encode())
+	} else {
+		endpoint = fmt.Sprintf("%s%s", c.apiURL, searchPath)
+	}
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to search api", "error", err)
+		return nil, err
+	}
+
+	var data SearchResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal search response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
 // SearchTrending gets Top-7 trending coins on CoinGecko as searched by users in the last 24 hours(ordered by most
 // popular first).
 //
