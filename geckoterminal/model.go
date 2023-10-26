@@ -6,14 +6,16 @@ type NetworksResponse struct {
 	LinksItem `json:"links"`
 }
 
-// GetSpecificPoolResponse returned by GetSpecificPool API.
-type GetSpecificPoolResponse struct {
+// PoolsResponse returned by pools APIs.
+type PoolsResponse struct {
 	Data    PoolDataItem       `json:"data"`
 	Include []PoolIncludedItem `json:"include,omitempty"`
 }
 
-// GetMultiPoolsResponse returned by GetMultiPools API.
-type GetMultiPoolsResponse struct {
-	Data    []PoolDataItem     `json:"data"`
-	Include []PoolIncludedItem `json:"include,omitempty"`
+// ErrorResponse is returned when failing to call API.
+type ErrorResponse struct {
+	Errors []struct {
+		Status string `json:"status"`
+		Title  string `json:"title"`
+	} `json:"errors"`
 }

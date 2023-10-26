@@ -1,5 +1,7 @@
 package geckoterminal
 
+import "time"
+
 type basicStruct struct {
 	ID   string `json:"id"`
 	Type string `json:"type"`
@@ -34,21 +36,21 @@ type PoolDataItem struct {
 
 // PoolAttributesItem
 type PoolAttributesItem struct {
-	BaseTokenPriceUSD             string                      `json:"base_token_price_usd"`
-	BaseTokenPriceNativeCurrency  string                      `json:"base_token_price_native_currency"`
-	QuotaTokenPriceUSD            string                      `json:"quota_token_price_usd"`
-	QuoteTokenPriceNativeCurrency string                      `json:"quote_token_price_native_currency"`
-	BaseTokenPriceQuoteToken      string                      `json:"base_token_price_quote_token"`
-	QuoteTokenPriceBaseToken      string                      `json:"quote_token_price_base_token"`
+	BaseTokenPriceUSD             *string                     `json:"base_token_price_usd"`
+	BaseTokenPriceNativeCurrency  *string                     `json:"base_token_price_native_currency"`
+	QuotaTokenPriceUSD            *string                     `json:"quota_token_price_usd"`
+	QuoteTokenPriceNativeCurrency *string                     `json:"quote_token_price_native_currency"`
+	BaseTokenPriceQuoteToken      *string                     `json:"base_token_price_quote_token"`
+	QuoteTokenPriceBaseToken      *string                     `json:"quote_token_price_base_token"`
 	Address                       string                      `json:"address"`
 	Name                          string                      `json:"name"`
-	PoolCreatedAt                 *int64                      `json:"pool_created_at"`
-	FDVUsed                       string                      `json:"fdv_used"`
-	MarketCapUSD                  string                      `json:"market_cap_usd"`
+	PoolCreatedAt                 *time.Time                  `json:"pool_created_at"`
+	FDVUsed                       *string                     `json:"fdv_used"`
+	MarketCapUSD                  *string                     `json:"market_cap_usd"`
 	PriceChangePercentage         map[string]string           `json:"price_change_percentage"`
 	Transactions                  map[string]TransactionsItem `json:"transactions"`
 	VolumeUSD                     map[string]string           `json:"volume_usd"`
-	ReserveInUSD                  string                      `json:"reserve_in_usd"`
+	ReserveInUSD                  *string                     `json:"reserve_in_usd"`
 }
 
 // TransactionsItem
@@ -61,9 +63,9 @@ type TransactionsItem struct {
 type PoolIncludedItem struct {
 	basicStruct
 	Attributes struct {
-		Address         string `json:"address"`
-		Name            string `json:"name"`
-		Symbol          string `json:"symbol"`
-		CoingeckoCoinID string `json:"coingecko_coin_id"`
+		Address         string  `json:"address,omitempty"`
+		Name            string  `json:"name"`
+		Symbol          string  `json:"symbol,omitempty"`
+		CoingeckoCoinID *string `json:"coingecko_coin_id,omitempty"`
 	} `json:"attributes"`
 }

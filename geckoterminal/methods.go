@@ -90,8 +90,8 @@ func (c *Client) GetDexes(ctx context.Context, network string, page uint) (*Netw
 // Query parameters:
 //
 // include(optional): Attributes for related resources to include, which will be returned under the top-level
-// "included" key. Available resources: base_token, quote_token, dex. Example: base_token,quote_token
-func (c *Client) GetSpecificPool(ctx context.Context, network, address, include string) (*GetSpecificPoolResponse, error) {
+// "included" key. Available resources: base_token, quote_token, dex. Example: base_token,quote_token.
+func (c *Client) GetSpecificPool(ctx context.Context, network, address, include string) (*PoolsResponse, error) {
 	if network == "" {
 		return nil, fmt.Errorf("network should not be empty")
 	}
@@ -118,7 +118,7 @@ func (c *Client) GetSpecificPool(ctx context.Context, network, address, include 
 		return nil, err
 	}
 
-	var data GetSpecificPoolResponse
+	var data PoolsResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal get specific pool response", "error", err)
 		return nil, err
@@ -141,8 +141,8 @@ func (c *Client) GetSpecificPool(ctx context.Context, network, address, include 
 // Query parameters:
 //
 // include(optional): Attributes for related resources to include, which will be returned under the top-level
-// "included" key. Available resources: base_token, quote_token, dex. Example: base_token,quote_token
-func (c *Client) GetMultiPools(ctx context.Context, network, include string, addresses []string) (*GetMultiPoolsResponse, error) {
+// "included" key. Available resources: base_token, quote_token, dex. Example: base_token,quote_token.
+func (c *Client) GetMultiPools(ctx context.Context, network string, include, addresses []string) (*PoolsResponse, error) {
 	if network == "" {
 		return nil, fmt.Errorf("network should not be empty")
 	}
@@ -151,8 +151,9 @@ func (c *Client) GetMultiPools(ctx context.Context, network, include string, add
 	}
 
 	params := url.Values{}
-	if include != "" {
-		params.Add("include", include)
+	if len(include) != 0 {
+		includeItem := strings.Join(include, ",")
+		params.Add("include", includeItem)
 	}
 
 	address := strings.Join(addresses, ",")
@@ -170,9 +171,229 @@ func (c *Client) GetMultiPools(ctx context.Context, network, include string, add
 		return nil, err
 	}
 
-	var data GetMultiPoolsResponse
+	var data PoolsResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal get multi pools response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// GetTop20Pools gets top 20 pools on a network.
+//
+// Note: rate limit for this API is 30 calls per minute.
+//
+// Path parameters:
+//
+// network(required): network id from /networks list. Example: eth.
+//
+// Query parameters:
+//
+// include(optional): Attributes for related resources to include, which will be returned under the top-level
+// "included" key. Available resources: base_token, quote_token, dex. Example: base_token,quote_token.
+func (c *Client) GetTop20Pools(ctx context.Context, network string, include []string) (*PoolsResponse, error) {
+	if network == "" {
+		return nil, fmt.Errorf("network should not be empty")
+	}
+
+	params := url.Values{}
+	if len(include) != 0 {
+		includeItem := strings.Join(include, ",")
+		params.Add("include", includeItem)
+	}
+
+	path := fmt.Sprintf(networksIDPoolsPath, network)
+	var endpoint string
+	if len(params) != 0 {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
+	} else {
+		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
+	}
+
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to get top 20 pools api", "error", err)
+		return nil, err
+	}
+
+	var data PoolsResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal get top 20 pools response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// GetTop20PoolsOnOneDex gets top 20 pools on a network's dex.
+//
+// Note: rate limit for this API is 30 calls per minute.
+//
+// Path parameters:
+//
+// network(required): network id from /networks list. Example: eth.
+//
+// Query parameters:
+//
+// dex(required): dex id from /networks/{network}/dexes list. Example: sushiswap.
+//
+// include(optional): Attributes for related resources to include, which will be returned under the top-level
+// "included" key. Available resources: base_token, quote_token, dex. Example: base_token,quote_token.
+func (c *Client) GetTop20PoolsOnOneDex(ctx context.Context, network, dex string, include []string) (*PoolsResponse, error) {
+	if network == "" {
+		return nil, fmt.Errorf("network should not be empty")
+	}
+
+	params := url.Values{}
+	if len(include) != 0 {
+		includeItem := strings.Join(include, ",")
+		params.Add("include", includeItem)
+	}
+
+	path := fmt.Sprintf(networksIDDexesPoolsPath, network, dex)
+	var endpoint string
+	if len(params) != 0 {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
+	} else {
+		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
+	}
+
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to get top 20 pools on one dex api", "error", err)
+		return nil, err
+	}
+
+	var data PoolsResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal get top 20 pools on one dex response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// GetLatest20PoolsOnOneNetwork gets latest 20 pools on a network.
+//
+// Note: rate limit for this API is 30 calls per minute.
+//
+// Path parameters:
+//
+// network(required): network id from /networks list. Example: eth.
+//
+// Query parameters:
+//
+// include(optional): Attributes for related resources to include, which will be returned under the top-level
+// "included" key. Available resources: base_token, quote_token, dex. Example: base_token,quote_token.
+func (c *Client) GetLatest20PoolsOnOneNetwork(ctx context.Context, network string, include []string) (*PoolsResponse, error) {
+	if network == "" {
+		return nil, fmt.Errorf("network should not be empty")
+	}
+
+	params := url.Values{}
+	if len(include) != 0 {
+		includeItem := strings.Join(include, ",")
+		params.Add("include", includeItem)
+	}
+
+	path := fmt.Sprintf(networksIDNewPoolsPath, network)
+	var endpoint string
+	if len(params) != 0 {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
+	} else {
+		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
+	}
+
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to get latest 20 pools on one network api", "error", err)
+		return nil, err
+	}
+
+	var data PoolsResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal get latest 20 pools on one network response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// GetLatest20PoolsOnAllNetworks gets latest 20 pools across all networks.
+//
+// Note: rate limit for this API is 30 calls per minute.
+//
+// Query parameters:
+//
+// include(optional): Attributes for related resources to include, which will be returned under the top-level
+// "included" key. Available resources: base_token, quote_token, dex. Example: base_token,quote_token.
+func (c *Client) GetLatest20PoolsOnAllNetworks(ctx context.Context, include []string) (*PoolsResponse, error) {
+	params := url.Values{}
+	if len(include) != 0 {
+		includeItem := strings.Join(include, ",")
+		params.Add("include", includeItem)
+	}
+
+	var endpoint string
+	if len(params) != 0 {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, networksNewPoolsPath)
+	} else {
+		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, networksNewPoolsPath, params.Encode())
+	}
+
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to get latest 20 pools on all networks api", "error", err)
+		return nil, err
+	}
+
+	var data PoolsResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal get latest 20 pools on all networks response", "error", err)
+		return nil, err
+	}
+	return &data, nil
+}
+
+// SearchPools search for pools on a network.
+//
+// Note: rate limit for this API is 30 calls per minute.
+//
+// Query parameters:
+//
+// query(optional): Search query: can be pool address, token address, or token symbol. Returns top 5 matching pools.
+// Example: ETH.
+//
+// network(optional): network id from /networks list. Example: eth.
+//
+// include(optional): Attributes for related resources to include, which will be returned under the top-level
+// "included" key. Available resources: base_token, quote_token, dex. Example: base_token,quote_token.
+func (c *Client) SearchPools(ctx context.Context, query, network string, include []string) (*PoolsResponse, error) {
+	params := url.Values{}
+	if query != "" {
+		params.Add("query", query)
+	}
+	if network != "" {
+		params.Add("network", network)
+	}
+	if len(include) != 0 {
+		includeItem := strings.Join(include, ",")
+		params.Add("include", includeItem)
+	}
+
+	var endpoint string
+	if len(params) != 0 {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, networksNewPoolsPath)
+	} else {
+		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, networksNewPoolsPath, params.Encode())
+	}
+
+	resp, _, err := c.sendReq(ctx, endpoint)
+	if err != nil {
+		slog.Error("failed to send request to search pools api", "error", err)
+		return nil, err
+	}
+
+	var data PoolsResponse
+	if err = json.Unmarshal(resp, &data); err != nil {
+		slog.Error("failed to unmarshal search pools response", "error", err)
 		return nil, err
 	}
 	return &data, nil
