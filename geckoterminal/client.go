@@ -41,7 +41,6 @@ func (c *Client) sendReq(ctx context.Context, endpoint string) ([]byte, http.Hea
 }
 
 func (c *Client) doAPI(ctx context.Context, req *http.Request) ([]byte, http.Header, error) {
-	req.Proto = "HTTP/2.0"
 	req.Header.Add(acceptHeader, jsonHeader)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
