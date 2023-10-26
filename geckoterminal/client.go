@@ -1,4 +1,4 @@
-package coingecko
+package geckoterminal
 
 import (
 	"bytes"
@@ -11,48 +11,38 @@ import (
 
 // Client struct
 type Client struct {
-	apiURL     string
-	apiKey     string
 	httpClient *http.Client
 }
 
-// NewCoinGecko create a new CoinGecko API client.
-func NewCoinGecko(apiKey string, httpClient *http.Client) *Client {
-	var apiURL string
-	if apiKey == "" {
-		apiURL = publicAPIEndpoint
-	} else {
-		apiURL = proAPIEndpoint
-	}
-
+// NewGeckoTerminal create a new GeckoTerminal API client.
+func NewGeckoTerminal(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
 
 	return &Client{
 		httpClient: httpClient,
-		apiURL:     apiURL,
-		apiKey:     apiKey,
 	}
 }
 
 func (c *Client) sendReq(ctx context.Context, endpoint string) ([]byte, http.Header, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
-		slog.Error("failed to new request with context", "error", err)
+		slog.Error("failed to new request with context", "endpoint", endpoint, "error", err)
 		return nil, nil, err
 	}
 
-	req = c.checkAPIKey(req)
 	data, header, err := c.doAPI(ctx, req)
 	if err != nil {
-		slog.Error("failed to do api", "url", req.URL.String(), "error", err)
+		slog.Error("failed to do api", "url", req.URL.String(), "header", req.Header, "error", err)
 		return nil, nil, err
 	}
 	return data, header, nil
 }
 
 func (c *Client) doAPI(ctx context.Context, req *http.Request) ([]byte, http.Header, error) {
+	req.Proto = "HTTP/2.0"
+	req.Header.Add(acceptHeader, jsonHeader)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		slog.Error("failed to do", "error", err)
@@ -77,18 +67,4 @@ func (c *Client) doAPI(ctx context.Context, req *http.Request) ([]byte, http.Hea
 		return nil, nil, err
 	}
 	return buf.Bytes(), resp.Header, nil
-}
-
-// check user whether provides api key, if provided adds it into http header.
-//
-// CoinGecko supports supplying API key in one of two ways:
-//
-// 1. Header: x-cg-pro-api-key
-//
-// 2. Query string parameter: x_cg_pro_api_key
-func (c *Client) checkAPIKey(req *http.Request) *http.Request {
-	if c.apiKey != "" {
-		req.Header.Add(proAPIKeyHeader, c.apiKey)
-	}
-	return req
 }
