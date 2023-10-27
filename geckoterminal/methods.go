@@ -10,21 +10,21 @@ import (
 	"strings"
 )
 
-// GetAllNetworks gets list of supported networks.
+// GetNetworks gets list of supported networks.
 //
 // Query parameters:
 //
 // page(optional): page through results.
 //
 // Note: rate limit for this API is 30 calls per minute.
-func (c *Client) GetAllNetworks(ctx context.Context, page uint) (*NetworksResponse, error) {
+func (c *Client) GetNetworks(ctx context.Context, page uint) (*NetworksResponse, error) {
 	params := url.Values{}
 	if page == 0 {
 		page = 1
 	}
 	params.Add("page", strconv.Itoa(int(page)))
 
-	endpoint := fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, networksPath, params.Encode())
+	endpoint := fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, getNetworksPath, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
 		slog.Error("failed to send request to networks api", "error", err)
@@ -61,7 +61,7 @@ func (c *Client) GetDexes(ctx context.Context, network string, page uint) (*Netw
 	}
 	params.Add("page", strconv.Itoa(int(page)))
 
-	path := fmt.Sprintf(dexesPath, network)
+	path := fmt.Sprintf(getDexesPath, network)
 	endpoint := fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
@@ -104,7 +104,7 @@ func (c *Client) GetSpecificPool(ctx context.Context, network, address, include 
 		params.Add("include", include)
 	}
 
-	path := fmt.Sprintf(networksIDPoolsAddressPath, network, address)
+	path := fmt.Sprintf(getSpecificPoolPath, network, address)
 	var endpoint string
 	if len(params) != 0 {
 		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
@@ -157,7 +157,7 @@ func (c *Client) GetMultiPools(ctx context.Context, network string, include, add
 	}
 
 	address := strings.Join(addresses, ",")
-	path := fmt.Sprintf(networksIDPoolsMultiPath, network, address)
+	path := fmt.Sprintf(getMultiPoolsPath, network, address)
 	var endpoint string
 	if len(params) != 0 {
 		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
@@ -202,7 +202,7 @@ func (c *Client) GetTop20Pools(ctx context.Context, network string, include []st
 		params.Add("include", includeItem)
 	}
 
-	path := fmt.Sprintf(networksIDPoolsPath, network)
+	path := fmt.Sprintf(getTop20PoolsPath, network)
 	var endpoint string
 	if len(params) != 0 {
 		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
@@ -249,7 +249,7 @@ func (c *Client) GetTop20PoolsOnOneDex(ctx context.Context, network, dex string,
 		params.Add("include", includeItem)
 	}
 
-	path := fmt.Sprintf(networksIDDexesPoolsPath, network, dex)
+	path := fmt.Sprintf(getTop20PoolsOnOneDexPath, network, dex)
 	var endpoint string
 	if len(params) != 0 {
 		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
@@ -294,7 +294,7 @@ func (c *Client) GetLatest20PoolsOnOneNetwork(ctx context.Context, network strin
 		params.Add("include", includeItem)
 	}
 
-	path := fmt.Sprintf(networksIDNewPoolsPath, network)
+	path := fmt.Sprintf(getLatest20PoolsOnOneNetworkPath, network)
 	var endpoint string
 	if len(params) != 0 {
 		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
@@ -333,9 +333,9 @@ func (c *Client) GetLatest20PoolsOnAllNetworks(ctx context.Context, include []st
 
 	var endpoint string
 	if len(params) != 0 {
-		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, networksNewPoolsPath)
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, getLatest20PoolsOnAllNetworkPath)
 	} else {
-		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, networksNewPoolsPath, params.Encode())
+		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, getLatest20PoolsOnAllNetworkPath, params.Encode())
 	}
 
 	resp, _, err := c.sendReq(ctx, endpoint)
@@ -428,7 +428,7 @@ func (c *Client) GetTop20PoolsForOneToken(ctx context.Context, network, tokenAdd
 		params.Add("include", includeItem)
 	}
 
-	path := fmt.Sprintf(networksIDTokensPoolsPath, network, tokenAddress)
+	path := fmt.Sprintf(getTop20PoolsForOneTokenPath, network, tokenAddress)
 	var endpoint string
 	if len(params) != 0 {
 		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
@@ -478,7 +478,7 @@ func (c *Client) GetSpecificTokenOnOneNetwork(ctx context.Context, network, addr
 		params.Add("include", includeItem)
 	}
 
-	path := fmt.Sprintf(networksIDTokensPath, network, address)
+	path := fmt.Sprintf(getSpecificTokenOnOneNetworkPath, network, address)
 	var endpoint string
 	if len(params) != 0 {
 		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
@@ -531,7 +531,7 @@ func (c *Client) GetMultiTokensOnOneNetwork(ctx context.Context, network, addres
 		params.Add("include", includeItem)
 	}
 
-	path := fmt.Sprintf(networksIDTokensMultiAddressesPath, network, address)
+	path := fmt.Sprintf(getMultiTokensOnOneNetworkPath, network, address)
 	var endpoint string
 	if len(params) != 0 {
 		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
@@ -562,8 +562,7 @@ func (c *Client) GetMultiTokensOnOneNetwork(ctx context.Context, network, addres
 // network(required): network id from /networks list. Example: eth.
 //
 // addresses(required): token address. Example: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
-func (c *Client) GetSpecificTokenInfoOnOneNetwork(ctx context.Context, network, address string, include []string) (
-	*TokenInfoResponse, error) {
+func (c *Client) GetSpecificTokenInfoOnOneNetwork(ctx context.Context, network, address string) (*TokenInfoResponse, error) {
 	if network == "" {
 		return nil, fmt.Errorf("network should not be empty")
 	}
@@ -571,7 +570,7 @@ func (c *Client) GetSpecificTokenInfoOnOneNetwork(ctx context.Context, network, 
 		return nil, fmt.Errorf("address should not be empty")
 	}
 
-	path := fmt.Sprintf(networksIDTokensInfoPath, network, address)
+	path := fmt.Sprintf(getSpecificTokenInfoOnOneNetworkPath, network, address)
 	endpoint := fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
@@ -604,7 +603,7 @@ func (c *Client) GetPoolTokensInfoOnOneNetwork(ctx context.Context, network, poo
 		return nil, fmt.Errorf("pool_address should not be empty")
 	}
 
-	path := fmt.Sprintf(networksIDPoolsInfoPath, network, poolAddress)
+	path := fmt.Sprintf(getPoolTokensInfoOnOneNetworkPath, network, poolAddress)
 	endpoint := fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
@@ -620,7 +619,7 @@ func (c *Client) GetPoolTokensInfoOnOneNetwork(ctx context.Context, network, poo
 	return &data, nil
 }
 
-// GetRecentlyUpdate100Tokens gets most recently 100 tokens info across all networks.
+// GetRecentlyUpdated100TokensInfo gets most recently 100 tokens info across all networks.
 //
 // Note: rate limit for this API is 30 calls per minute.
 //
@@ -628,7 +627,7 @@ func (c *Client) GetPoolTokensInfoOnOneNetwork(ctx context.Context, network, poo
 //
 // include(optional): attributes for related resources to include, which will be returned under the top-level "included"
 // key. Available resources: network. Example: network.
-func (c *Client) GetRecentlyUpdate100Tokens(ctx context.Context, include string) (*RecentlyUpdatedTokensResponse, error) {
+func (c *Client) GetRecentlyUpdated100TokensInfo(ctx context.Context, include string) (*RecentlyUpdatedTokensResponse, error) {
 	params := url.Values{}
 	if include == "" {
 		params.Add("include", include)
@@ -636,13 +635,13 @@ func (c *Client) GetRecentlyUpdate100Tokens(ctx context.Context, include string)
 
 	var endpoint string
 	if len(params) == 0 {
-		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, tokensInfoRecentlyUpdatedPath)
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, getRecentlyUpdated100TokensInfoPath)
 	} else {
-		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, tokensInfoRecentlyUpdatedPath, params.Encode())
+		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, getRecentlyUpdated100TokensInfoPath, params.Encode())
 	}
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to get recently updated 100 tokens api", "error", err)
+		slog.Error("failed to send request to get recently updated 100 tokens info api", "error", err)
 		return nil, err
 	}
 
@@ -713,7 +712,7 @@ func (c *Client) GetOHLCV(ctx context.Context, network, poolAddress, timeframe s
 		params.Add("token", token)
 	}
 
-	path := fmt.Sprintf(networksIDPoolsOHLCVPath, network, poolAddress, timeframe)
+	path := fmt.Sprintf(getOHLCVPath, network, poolAddress, timeframe)
 	endpoint := fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {

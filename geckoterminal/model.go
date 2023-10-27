@@ -1,6 +1,6 @@
 package geckoterminal
 
-// NetworksResponse returned by GetAllNetworks or GetDexes API.
+// NetworksResponse returned by GetNetworks or GetDexes API.
 type NetworksResponse struct {
 	Data      []struct{ NetworksItem } `json:"data"`
 	LinksItem `json:"links"`
