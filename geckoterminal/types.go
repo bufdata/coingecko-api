@@ -13,10 +13,17 @@ type NetworksItem struct {
 	Attributes AttributesItem `json:"attributes"`
 }
 
+type DexesItem struct {
+	basicStruct
+	Attributes struct {
+		Name string `json:"name"`
+	} `json:"attributes"`
+}
+
 // AttributesItem
 type AttributesItem struct {
 	Name                     string  `json:"name"`
-	CoingeckoAssetPlatformID *string `json:"coingecko_asset_platform_id,omitempty"`
+	CoingeckoAssetPlatformID *string `json:"coingecko_asset_platform_id"`
 }
 
 // LinksItem used for pagination
@@ -30,15 +37,15 @@ type LinksItem struct {
 // PoolDataItem
 type PoolDataItem struct {
 	basicStruct
-	Attributes    PoolAttributesItem     `json:"attributes"`
-	Relationships map[string]basicStruct `json:"relationships"`
+	Attributes    PoolAttributesItem                `json:"attributes"`
+	Relationships map[string]map[string]basicStruct `json:"relationships"`
 }
 
 // PoolAttributesItem
 type PoolAttributesItem struct {
 	BaseTokenPriceUSD             *string                     `json:"base_token_price_usd"`
 	BaseTokenPriceNativeCurrency  *string                     `json:"base_token_price_native_currency"`
-	QuotaTokenPriceUSD            *string                     `json:"quota_token_price_usd"`
+	QuoteTokenPriceUSD            *string                     `json:"quote_token_price_usd"`
 	QuoteTokenPriceNativeCurrency *string                     `json:"quote_token_price_native_currency"`
 	BaseTokenPriceQuoteToken      *string                     `json:"base_token_price_quote_token"`
 	QuoteTokenPriceBaseToken      *string                     `json:"quote_token_price_base_token"`
@@ -46,7 +53,7 @@ type PoolAttributesItem struct {
 	Name                          string                      `json:"name"`
 	PoolCreatedAt                 *time.Time                  `json:"pool_created_at"`
 	TokenPriceUSD                 *string                     `json:"token_price_usd,omitempty"`
-	FDVUsed                       *string                     `json:"fdv_used"`
+	FDVUSD                        *string                     `json:"fdv_usd"`
 	MarketCapUSD                  *string                     `json:"market_cap_usd"`
 	PriceChangePercentage         map[string]string           `json:"price_change_percentage"`
 	Transactions                  map[string]TransactionsItem `json:"transactions"`

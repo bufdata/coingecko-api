@@ -50,7 +50,7 @@ func (c *Client) GetNetworks(ctx context.Context, page uint) (*NetworksResponse,
 // Query parameters:
 //
 // page(optional): page through results.
-func (c *Client) GetDexes(ctx context.Context, network string, page uint) (*NetworksResponse, error) {
+func (c *Client) GetDexes(ctx context.Context, network string, page uint) (*DexesResponse, error) {
 	if network == "" {
 		return nil, fmt.Errorf("network should not be empty")
 	}
@@ -69,7 +69,7 @@ func (c *Client) GetDexes(ctx context.Context, network string, page uint) (*Netw
 		return nil, err
 	}
 
-	var data NetworksResponse
+	var data DexesResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal get dexes response", "error", err)
 		return nil, err
@@ -85,13 +85,13 @@ func (c *Client) GetDexes(ctx context.Context, network string, page uint) (*Netw
 //
 // network(required): network id from /networks list. Example: eth.
 //
-// address(required): pool address. Example: 0x60594a405d53811d3bc4766596efd80fd545a270
+// address(required): pool address. Example: 0x60594a405d53811d3bc4766596efd80fd545a270.
 //
 // Query parameters:
 //
 // include(optional): Attributes for related resources to include, which will be returned under the top-level
 // "included" key. Available resources: base_token, quote_token, dex. Example: base_token,quote_token.
-func (c *Client) GetSpecificPool(ctx context.Context, network, address, include string) (*PoolsResponse, error) {
+func (c *Client) GetSpecificPool(ctx context.Context, network, address string, include []string) (*SpecificPoolResponse, error) {
 	if network == "" {
 		return nil, fmt.Errorf("network should not be empty")
 	}
@@ -100,16 +100,17 @@ func (c *Client) GetSpecificPool(ctx context.Context, network, address, include 
 	}
 
 	params := url.Values{}
-	if include != "" {
-		params.Add("include", include)
+	if len(include) != 0 {
+		includeParam := strings.Join(include, ",")
+		params.Add("include", includeParam)
 	}
 
 	path := fmt.Sprintf(getSpecificPoolPath, network, address)
 	var endpoint string
 	if len(params) != 0 {
-		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
-	} else {
 		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
+	} else {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
 	}
 
 	resp, _, err := c.sendReq(ctx, endpoint)
@@ -118,7 +119,7 @@ func (c *Client) GetSpecificPool(ctx context.Context, network, address, include 
 		return nil, err
 	}
 
-	var data PoolsResponse
+	var data SpecificPoolResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal get specific pool response", "error", err)
 		return nil, err
@@ -136,7 +137,7 @@ func (c *Client) GetSpecificPool(ctx context.Context, network, address, include 
 //
 // addresses(required): comma-separated list of pool addresses (up to 30 addresses); addresses not found in the
 // GeckoTerminal database will be ignored.
-// Example: 0x60594a405d53811d3bc4766596efd80fd545a270,0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640
+// Example: 0x60594a405d53811d3bc4766596efd80fd545a270,0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640.
 //
 // Query parameters:
 //
@@ -152,17 +153,17 @@ func (c *Client) GetMultiPools(ctx context.Context, network string, include, add
 
 	params := url.Values{}
 	if len(include) != 0 {
-		includeItem := strings.Join(include, ",")
-		params.Add("include", includeItem)
+		includeParam := strings.Join(include, ",")
+		params.Add("include", includeParam)
 	}
 
 	address := strings.Join(addresses, ",")
 	path := fmt.Sprintf(getMultiPoolsPath, network, address)
 	var endpoint string
 	if len(params) != 0 {
-		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
-	} else {
 		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
+	} else {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
 	}
 
 	resp, _, err := c.sendReq(ctx, endpoint)
@@ -179,7 +180,7 @@ func (c *Client) GetMultiPools(ctx context.Context, network string, include, add
 	return &data, nil
 }
 
-// GetTop20Pools gets top 20 pools on a network.
+// GetTop20PoolsOnOneNetwork gets top 20 pools on a network.
 //
 // Note: rate limit for this API is 30 calls per minute.
 //
@@ -191,23 +192,23 @@ func (c *Client) GetMultiPools(ctx context.Context, network string, include, add
 //
 // include(optional): Attributes for related resources to include, which will be returned under the top-level
 // "included" key. Available resources: base_token, quote_token, dex. Example: base_token,quote_token.
-func (c *Client) GetTop20Pools(ctx context.Context, network string, include []string) (*PoolsResponse, error) {
+func (c *Client) GetTop20PoolsOnOneNetwork(ctx context.Context, network string, include []string) (*PoolsResponse, error) {
 	if network == "" {
 		return nil, fmt.Errorf("network should not be empty")
 	}
 
 	params := url.Values{}
 	if len(include) != 0 {
-		includeItem := strings.Join(include, ",")
-		params.Add("include", includeItem)
+		includeParam := strings.Join(include, ",")
+		params.Add("include", includeParam)
 	}
 
 	path := fmt.Sprintf(getTop20PoolsPath, network)
 	var endpoint string
 	if len(params) != 0 {
-		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
-	} else {
 		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
+	} else {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
 	}
 
 	resp, _, err := c.sendReq(ctx, endpoint)
@@ -245,16 +246,16 @@ func (c *Client) GetTop20PoolsOnOneDex(ctx context.Context, network, dex string,
 
 	params := url.Values{}
 	if len(include) != 0 {
-		includeItem := strings.Join(include, ",")
-		params.Add("include", includeItem)
+		includeParam := strings.Join(include, ",")
+		params.Add("include", includeParam)
 	}
 
 	path := fmt.Sprintf(getTop20PoolsOnOneDexPath, network, dex)
 	var endpoint string
 	if len(params) != 0 {
-		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
-	} else {
 		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
+	} else {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
 	}
 
 	resp, _, err := c.sendReq(ctx, endpoint)
@@ -290,16 +291,16 @@ func (c *Client) GetLatest20PoolsOnOneNetwork(ctx context.Context, network strin
 
 	params := url.Values{}
 	if len(include) != 0 {
-		includeItem := strings.Join(include, ",")
-		params.Add("include", includeItem)
+		includeParam := strings.Join(include, ",")
+		params.Add("include", includeParam)
 	}
 
 	path := fmt.Sprintf(getLatest20PoolsOnOneNetworkPath, network)
 	var endpoint string
 	if len(params) != 0 {
-		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
-	} else {
 		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
+	} else {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
 	}
 
 	resp, _, err := c.sendReq(ctx, endpoint)
@@ -327,15 +328,15 @@ func (c *Client) GetLatest20PoolsOnOneNetwork(ctx context.Context, network strin
 func (c *Client) GetLatest20PoolsOnAllNetworks(ctx context.Context, include []string) (*PoolsResponse, error) {
 	params := url.Values{}
 	if len(include) != 0 {
-		includeItem := strings.Join(include, ",")
-		params.Add("include", includeItem)
+		includeParam := strings.Join(include, ",")
+		params.Add("include", includeParam)
 	}
 
 	var endpoint string
 	if len(params) != 0 {
-		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, getLatest20PoolsOnAllNetworkPath)
-	} else {
 		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, getLatest20PoolsOnAllNetworkPath, params.Encode())
+	} else {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, getLatest20PoolsOnAllNetworkPath)
 	}
 
 	resp, _, err := c.sendReq(ctx, endpoint)
@@ -374,15 +375,15 @@ func (c *Client) SearchPools(ctx context.Context, query, network string, include
 		params.Add("network", network)
 	}
 	if len(include) != 0 {
-		includeItem := strings.Join(include, ",")
-		params.Add("include", includeItem)
+		includeParam := strings.Join(include, ",")
+		params.Add("include", includeParam)
 	}
 
 	var endpoint string
 	if len(params) != 0 {
-		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, searchPoolsPath)
-	} else {
 		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, searchPoolsPath, params.Encode())
+	} else {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, searchPoolsPath)
 	}
 
 	resp, _, err := c.sendReq(ctx, endpoint)
@@ -424,16 +425,16 @@ func (c *Client) GetTop20PoolsForOneToken(ctx context.Context, network, tokenAdd
 
 	params := url.Values{}
 	if len(include) != 0 {
-		includeItem := strings.Join(include, ",")
-		params.Add("include", includeItem)
+		includeParam := strings.Join(include, ",")
+		params.Add("include", includeParam)
 	}
 
 	path := fmt.Sprintf(getTop20PoolsForOneTokenPath, network, tokenAddress)
 	var endpoint string
 	if len(params) != 0 {
-		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
-	} else {
 		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
+	} else {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
 	}
 
 	resp, _, err := c.sendReq(ctx, endpoint)
@@ -474,16 +475,16 @@ func (c *Client) GetSpecificTokenOnOneNetwork(ctx context.Context, network, addr
 
 	params := url.Values{}
 	if len(include) != 0 {
-		includeItem := strings.Join(include, ",")
-		params.Add("include", includeItem)
+		includeParam := strings.Join(include, ",")
+		params.Add("include", includeParam)
 	}
 
 	path := fmt.Sprintf(getSpecificTokenOnOneNetworkPath, network, address)
 	var endpoint string
 	if len(params) != 0 {
-		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
-	} else {
 		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
+	} else {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
 	}
 
 	resp, _, err := c.sendReq(ctx, endpoint)
@@ -508,7 +509,7 @@ func (c *Client) GetSpecificTokenOnOneNetwork(ctx context.Context, network, addr
 //
 // network(required): network id from /networks list. Example: eth.
 //
-// addresses(required): comma-separated list of token addresses (up to 30 addresses)
+// addresses(required): comma-separated list of token addresses (up to 30 addresses).
 // addresses not found in the GeckoTerminal database will be ignored.
 // Note: top_pools for this endpoint returns only the first top pool for each token.
 // Example: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.
@@ -527,16 +528,16 @@ func (c *Client) GetMultiTokensOnOneNetwork(ctx context.Context, network, addres
 
 	params := url.Values{}
 	if len(include) != 0 {
-		includeItem := strings.Join(include, ",")
-		params.Add("include", includeItem)
+		includeParam := strings.Join(include, ",")
+		params.Add("include", includeParam)
 	}
 
 	path := fmt.Sprintf(getMultiTokensOnOneNetworkPath, network, address)
 	var endpoint string
 	if len(params) != 0 {
-		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
-	} else {
 		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
+	} else {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, path)
 	}
 
 	resp, _, err := c.sendReq(ctx, endpoint)
@@ -634,10 +635,10 @@ func (c *Client) GetRecentlyUpdated100TokensInfo(ctx context.Context, include st
 	}
 
 	var endpoint string
-	if len(params) == 0 {
-		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, getRecentlyUpdated100TokensInfoPath)
-	} else {
+	if len(params) != 0 {
 		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, getRecentlyUpdated100TokensInfoPath, params.Encode())
+	} else {
+		endpoint = fmt.Sprintf("%s%s", geckoTerminalAPIEndpoint, getRecentlyUpdated100TokensInfoPath)
 	}
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
