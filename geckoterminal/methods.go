@@ -465,7 +465,7 @@ func (c *Client) GetTop20PoolsForOneToken(ctx context.Context, network, tokenAdd
 //
 // include(optional): Attributes for related resources to include, which will be returned under the top-level
 // "included" key. Available resources: top_pools. Example: top_pools.
-func (c *Client) GetSpecificTokenOnOneNetwork(ctx context.Context, network, address string, include []string) (*TokenResponse, error) {
+func (c *Client) GetSpecificTokenOnOneNetwork(ctx context.Context, network, address string, include []string) (*SpecificTokenResponse, error) {
 	if network == "" {
 		return nil, fmt.Errorf("network should not be empty")
 	}
@@ -493,7 +493,7 @@ func (c *Client) GetSpecificTokenOnOneNetwork(ctx context.Context, network, addr
 		return nil, err
 	}
 
-	var data TokenResponse
+	var data SpecificTokenResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal get specific token on one network response", "error", err)
 		return nil, err
@@ -518,11 +518,11 @@ func (c *Client) GetSpecificTokenOnOneNetwork(ctx context.Context, network, addr
 //
 // include(optional): Attributes for related resources to include, which will be returned under the top-level
 // "included" key. Available resources: top_pools. Example: top_pools.
-func (c *Client) GetMultiTokensOnOneNetwork(ctx context.Context, network, address string, include []string) (*TokenDataItem, error) {
+func (c *Client) GetMultiTokensOnOneNetwork(ctx context.Context, network string, addresses, include []string) (*TokensResponse, error) {
 	if network == "" {
 		return nil, fmt.Errorf("network should not be empty")
 	}
-	if address == "" {
+	if len(addresses) == 0 {
 		return nil, fmt.Errorf("address should not be empty")
 	}
 
@@ -532,7 +532,8 @@ func (c *Client) GetMultiTokensOnOneNetwork(ctx context.Context, network, addres
 		params.Add("include", includeParam)
 	}
 
-	path := fmt.Sprintf(getMultiTokensOnOneNetworkPath, network, address)
+	addressParam := strings.Join(addresses, ",")
+	path := fmt.Sprintf(getMultiTokensOnOneNetworkPath, network, addressParam)
 	var endpoint string
 	if len(params) != 0 {
 		endpoint = fmt.Sprintf("%s%s?%s", geckoTerminalAPIEndpoint, path, params.Encode())
@@ -546,7 +547,7 @@ func (c *Client) GetMultiTokensOnOneNetwork(ctx context.Context, network, addres
 		return nil, err
 	}
 
-	var data TokenDataItem
+	var data TokensResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal get multi tokens on one network response", "error", err)
 		return nil, err
@@ -628,10 +629,11 @@ func (c *Client) GetPoolTokensInfoOnOneNetwork(ctx context.Context, network, poo
 //
 // include(optional): attributes for related resources to include, which will be returned under the top-level "included"
 // key. Available resources: network. Example: network.
-func (c *Client) GetRecentlyUpdated100TokensInfo(ctx context.Context, include string) (*RecentlyUpdatedTokensResponse, error) {
+func (c *Client) GetRecentlyUpdated100TokensInfo(ctx context.Context, include []string) (*RecentlyUpdatedTokensResponse, error) {
 	params := url.Values{}
-	if include == "" {
-		params.Add("include", include)
+	if len(include) != 0 {
+		includeParam := strings.Join(include, ",")
+		params.Add("include", includeParam)
 	}
 
 	var endpoint string
