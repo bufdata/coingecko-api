@@ -7,7 +7,7 @@ const (
 
 const (
 	acceptHeader = "accept"
-	jsonHeader   = "application/json;version=20230302"
+	jsonHeader   = "application/json"
 )
 
 const (

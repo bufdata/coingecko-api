@@ -340,7 +340,7 @@ func (c *Client) ExchangesIDVolumeChartRange(ctx context.Context, id string, fro
 	params.Add("from", strconv.Itoa(int(from)))
 	params.Add("to", strconv.Itoa(int(to)))
 
-	path := fmt.Sprintf(exchangesVolumeChartPath, id)
+	path := fmt.Sprintf(exchangeVolumeChartRangePath, id)
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
