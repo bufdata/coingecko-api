@@ -24,12 +24,21 @@ type PoolsResponse struct {
 	Included []PoolIncludedItem `json:"included,omitempty"`
 }
 
-// TokenResponse returned by token APIs.
-type TokenResponse struct {
+// SpecificTokenResponse returned by GetSpecificTokenOnOneNetwork API.
+type SpecificTokenResponse struct {
 	Data     TokenDataItem `json:"data"`
 	Included []struct {
 		basicStruct
-		PoolIncludedItem
+		PoolDataItem
+	} `json:"included,omitempty"`
+}
+
+// TokensResponse returned by GetMultiTokensOnOneNetwork API.
+type TokensResponse struct {
+	Data     []TokenDataItem `json:"data"`
+	Included []struct {
+		basicStruct
+		PoolDataItem
 	} `json:"included,omitempty"`
 }
 
@@ -49,15 +58,15 @@ type RecentlyUpdatedTokensResponse struct {
 	Include []TokensInfoIncludedItem `json:"included"`
 }
 
-// OHLCVResponse
+// OHLCVResponse returned by GetOHLCV API.
 type OHLCVResponse struct {
-	basicStruct
-	Attributes struct {
-		OHLCVList []OHLCVItem `json:"ohlcv_list"`
-	} `json:"attributes"`
+	Data struct {
+		basicStruct
+		Attributes struct {
+			OHLCVList []OHLCVItem `json:"ohlcv_list"`
+		} `json:"attributes"`
+	} `json:"data"`
 }
-
-type OHLCVItem [6]float64
 
 // ErrorResponse is returned when failing to call API.
 type ErrorResponse struct {

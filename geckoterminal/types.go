@@ -105,31 +105,34 @@ type TokenAttributesItem struct {
 // TokenInfoDataItem
 type TokenInfoDataItem struct {
 	basicStruct
-	Attributes    TokenInfoAttributesItem `json:"attributes"`
-	Relationships map[string]basicStruct  `json:"relationships"`
+	Attributes    TokenInfoAttributesItem           `json:"attributes"`
+	Relationships map[string]map[string]basicStruct `json:"relationships,omitempty"`
 }
 
 // TokenInfoAttributesItem
 type TokenInfoAttributesItem struct {
-	Address           string    `json:"address"`
-	Name              string    `json:"name"`
-	Symbol            string    `json:"symbol"`
-	CoingeckoCoinID   string    `json:"coingecko_coin_id"`
-	ImageURL          string    `json:"image_url"`
-	Websites          []string  `json:"websites"`
-	Description       string    `json:"description"`
-	GTScore           float64   `json:"gt_score"`
-	DiscordURL        *string   `json:"discord_url"`
-	TelegramHandle    *string   `json:"telegram_handle"`
-	TwitterHandle     *string   `json:"twitter_handle"`
-	MetadataUpdatedAt time.Time `json:"metadata_updated_at,omitempty"`
+	Address           string     `json:"address"`
+	Name              string     `json:"name"`
+	Symbol            string     `json:"symbol"`
+	CoingeckoCoinID   string     `json:"coingecko_coin_id"`
+	ImageURL          string     `json:"image_url"`
+	Websites          []string   `json:"websites"`
+	Description       string     `json:"description"`
+	GTScore           float64    `json:"gt_score"`
+	MetadataUpdatedAt *time.Time `json:"metadata_updated_at,omitempty"`
+	DiscordURL        *string    `json:"discord_url"`
+	TelegramHandle    *string    `json:"telegram_handle"`
+	TwitterHandle     *string    `json:"twitter_handle"`
 }
 
 // TokensInfoIncludedItem
 type TokensInfoIncludedItem struct {
 	basicStruct
 	Attributes struct {
-		Name            string  `json:"name"`
-		CoingeckoCoinID *string `json:"coingecko_coin_id,omitempty"`
+		Name                     string  `json:"name"`
+		CoingeckoAssetPlatformID *string `json:"coingecko_asset_platform_id"`
 	} `json:"attributes"`
 }
+
+// OHLCVItem used for OHLCVResponse.
+type OHLCVItem [6]float64
