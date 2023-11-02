@@ -2,11 +2,8 @@ package coingecko
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"log"
 	"log/slog"
-	"os"
 	"testing"
 
 	"github.com/neuprotron/coingecko-api/coingecko"
@@ -72,281 +69,259 @@ func TestClient_SimpleSupportedVSCurrencies(t *testing.T) {
 	slog.Info("call SimpleSupportedVSCurrencies successfully", "response data", *data)
 }
 
-func TestClient_CoinsListTrue(t *testing.T) {
+func TestClient_ListCoinsInfoTrue(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CoinsList(context.Background(), true)
+	data, err := api.ListCoinsInfo(context.Background(), true)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsList successfully", "response data", (*data)[0])
+	slog.Info("call ListSupportedCoinsInfo successfully", "response data", (*data)[0])
 }
 
-func TestClient_CoinsListFalse(t *testing.T) {
+func TestClient_ListCoinsInfoFalse(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CoinsList(context.Background(), false)
+	data, err := api.ListCoinsInfo(context.Background(), false)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsList successfully", "response data", (*data)[0])
+	slog.Info("call ListCoinsInfo successfully", "response data", (*data)[0])
 }
 
-func TestClient_CoinsMarkets(t *testing.T) {
+func TestClient_ListCoinsMarketsData(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CoinsMarkets(context.Background(), "usd", []string{"bitcoin", "ethereum"}, emptyString,
+	data, err := api.ListCoinsMarketsData(context.Background(), "usd", []string{"bitcoin", "ethereum"}, emptyString,
 		emptyString, 0, 0, false, []string{"1h", "24h", "7d"}, emptyString, emptyString)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsMarkets successfully", "response data", (*data)[0])
+	slog.Info("call ListCoinsMarketsData successfully", "response data", (*data)[0])
 }
 
-func TestClient_CoinsID(t *testing.T) {
+func TestClient_GetCoinDataByCoinID(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CoinsID(context.Background(), "ethereum", true, true, true, true, true, false)
+	data, err := api.GetCoinDataByCoinID(context.Background(), "ethereum", true, true, true, true, true, false)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsID successfully", "response data", data.Name)
+	slog.Info("call GetCoinDataByCoinID successfully", "response data", data.Name)
 }
 
-func TestClient_CoinsIDTickers(t *testing.T) {
+func TestClient_GetTickersByCoinID(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, pageCount, err := api.CoinsIDTickers(context.Background(), "ethereum", "", true, 1, emptyString, true)
+	data, pageCount, err := api.GetCoinTickersByCoinID(context.Background(), "ethereum", "", true, 1, emptyString, true)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsIDTickers successfully", "response data", data.Name, "page count", pageCount)
+	slog.Info("call GetCoinTickersByCoinID successfully", "response data", data.Name, "page count", pageCount)
 }
 
-func TestClient_CoinsIDHistory(t *testing.T) {
+func TestClient_GetCoinHistoryDataByCoinID(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CoinsIDHistory(context.Background(), "ethereum", "01-10-2023", true)
+	data, err := api.GetCoinHistoryDataByCoinID(context.Background(), "ethereum", "01-10-2023", true)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsIDHistory successfully", "response data", data.Name)
+	slog.Info("call GetCoinHistoryDataByCoinID successfully", "response data", data.Name)
 }
 
-func TestClient_CoinsIDMarketChart(t *testing.T) {
+func TestClient_GetCoinMarketChartByCoinID(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CoinsIDMarketChart(context.Background(), "ethereum", "usd", "max", "daily", "full")
+	data, err := api.GetCoinMarketChartByCoinID(context.Background(), "ethereum", "usd", "max", "daily", "full")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsIDMarketChart successfully", "response data", len(data.MarketCaps))
+	slog.Info("call GetCoinMarketChartByCoinID successfully", "response data", len(data.MarketCaps))
 }
 
-func TestClient_CoinsIDMarketChartRange(t *testing.T) {
+func TestClient_GetCoinMarketChartRangeByCoinID(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CoinsIDMarketChartRange(context.Background(), "ethereum", "usd", "1682477232", "1682577232", "full")
+	data, err := api.GetCoinMarketChartRangeByCoinID(context.Background(), "ethereum", "usd", "1682477232", "1682577232", "full")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsIDMarketChartRange successfully", "response data", len(data.MarketCaps))
+	slog.Info("call GetCoinMarketChartRangeByCoinID successfully", "response data", len(data.MarketCaps))
 }
 
-func TestClient_CoinsIDOHLC(t *testing.T) {
+func TestClient_GetCoinOHLCByCoinID(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CoinsIDOHLC(context.Background(), "ethereum", "usd", "1", "full")
+	data, err := api.GetCoinOHLCByCoinID(context.Background(), "ethereum", "usd", "1", "full")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsIDOHLC successfully", "response data", len(*data))
+	slog.Info("call GetCoinOHLCByCoinID successfully", "response data", len(*data))
 }
 
-func TestClient_CoinsContract(t *testing.T) {
+func TestClient_GetCoinInfoByContractAddress(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CoinsContract(context.Background(), "ethereum", "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984")
+	data, err := api.GetCoinInfoByContractAddress(context.Background(), "ethereum", "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsContract successfully", "response data", data.Name)
+	slog.Info("call GetCoinInfoByContractAddress successfully", "response data", data.Name)
 }
 
-func TestClient_CoinsContractMarketChart(t *testing.T) {
+func TestClient_GetMarketChartByContractAddress(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CoinsContractMarketChart(context.Background(), "ethereum", "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+	data, err := api.GetMarketChartByContractAddress(context.Background(), "ethereum", "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
 		"usd", "1", "full")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsContract successfully", "response data", len(data.Prices))
+	slog.Info("call GetMarketChartByContractAddress successfully", "response data", len(data.Prices))
 }
 
-func TestClient_CoinsContractMarketChartRange(t *testing.T) {
+func TestClient_GetMarketChartRangeByContractAddress(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CoinsContractMarketChartRange(context.Background(), "ethereum", "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+	data, err := api.GetMarketChartRangeByContractAddress(context.Background(), "ethereum", "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
 		"usd", "1682477232", "1682577232", "full")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsContractMarketChartRange successfully", "response data", len(data.Prices))
+	slog.Info("call GetMarketChartRangeByContractAddress successfully", "response data", len(data.Prices))
 }
 
-func TestClient_AssetPlatforms(t *testing.T) {
+func TestClient_ListAllAssetPlatforms(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.AssetPlatforms(context.Background(), "")
+	data, err := api.ListAllAssetPlatforms(context.Background(), "")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call AssetPlatforms successfully", "response data", *data)
+	slog.Info("call ListAllAssetPlatforms successfully", "response data", *data)
 }
 
-func TestClient_CoinsCategoriesList(t *testing.T) {
+func TestClient_ListAllCategories(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CoinsCategoriesList(context.Background())
+	data, err := api.ListAllCategories(context.Background())
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsCategoriesList successfully", "response data", len(*data))
+	slog.Info("call ListAllCategories successfully", "response data", len(*data))
 }
 
-func TestClient_CoinsCategories(t *testing.T) {
+func TestClient_ListAllCategoriesWithMarketData(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CoinsCategories(context.Background(), emptyString)
+	data, err := api.ListAllCategoriesWithMarketData(context.Background(), emptyString)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CoinsCategories successfully", "response data", len(*data))
+	slog.Info("call ListAllCategoriesWithMarketData successfully", "response data", len(*data))
 }
 
-func TestClient_Exchanges(t *testing.T) {
+func TestClient_ListAllExchanges(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, pageCount, err := api.Exchanges(context.Background(), 0, 0)
+	data, pageCount, err := api.ListAllExchanges(context.Background(), 0, 0)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call Exchanges successfully", "response data", len(*data), "page count", pageCount)
+	slog.Info("call ListAllExchanges successfully", "response data", len(*data), "page count", pageCount)
 }
 
-func TestClient_ExchangesList(t *testing.T) {
+func TestClient_ListAllMarketsInfo(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.ExchangesList(context.Background())
+	data, err := api.ListAllMarketsInfo(context.Background())
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call ExchangesList successfully", "response data", len(*data))
+	slog.Info("call ListAllMarketsInfo successfully", "response data", len(*data))
 }
 
-func TestClient_ExchangesID(t *testing.T) {
+func TestClient_GetVolumeAndTickersByExchangeID(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.ExchangesID(context.Background(), "uniswap_v3")
+	data, err := api.GetExchangeVolumeAndTickersByExchangeID(context.Background(), "uniswap_v3")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call ExchangesID successfully", "response data", data.Name)
+	slog.Info("call GetExchangeVolumeAndTickersByExchangeID successfully", "response data", data.Name)
 }
 
-func TestClient_ExchangesIDTickers(t *testing.T) {
+func TestClient_GetExchangeTickersByExchangeID(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, count, err := api.ExchangesIDTickers(context.Background(), "binance", "curve-dao-token", true, 1, true, "")
+	data, count, err := api.GetExchangeTickersByExchangeID(context.Background(), "binance", "curve-dao-token", true, 1, true, "")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call ExchangesIDTickers successfully", "response data", data.Name, "count", count)
+	slog.Info("call GetExchangeTickersByExchangeID successfully", "response data", data.Name, "count", count)
 }
 
-func TestClient_ExchangesIDVolumeChart(t *testing.T) {
+func TestClient_GetExchangeVolumeChartByExchangeID(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.ExchangesIDVolumeChart(context.Background(), "binance", 1)
+	data, err := api.GetExchangeVolumeChartByExchangeID(context.Background(), "binance", 1)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call ExchangesIDVolumeChart successfully", "response data", len(*data))
+	slog.Info("call GetExchangeVolumeChartByExchangeID successfully", "response data", len(*data))
 }
 
-func TestClient_Derivatives(t *testing.T) {
+func TestClient_ListAllDerivativesTickers(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.Derivatives(context.Background(), "")
+	data, err := api.ListAllDerivativesTickers(context.Background(), "")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call Derivatives successfully", "response data", len(*data))
+	slog.Info("call ListAllDerivativesTickers successfully", "response data", len(*data))
 }
 
-func TestClient_DerivativesExchanges(t *testing.T) {
+func TestClient_ListAllDerivativesExchanges(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, count, err := api.DerivativesExchanges(context.Background(), "", 0, 0)
+	data, count, err := api.ListAllDerivativesExchanges(context.Background(), "", 0, 0)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call DerivativesExchanges successfully", "response data", len(*data), "count", count)
+	slog.Info("call ListAllDerivativesExchanges successfully", "response data", len(*data), "count", count)
 }
 
-func TestClient_DerivativesExchangesID(t *testing.T) {
+func TestClient_ListDerivativesExchangeData(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.DerivativesExchangesID(context.Background(), "binance_futures", "all")
+	data, err := api.ListDerivativesExchangeData(context.Background(), "binance_futures", "all")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call DerivativesExchanges successfully", "response data", (*data).Name)
+	slog.Info("call ListDerivativesExchangeData successfully", "response data", (*data).Name)
 }
 
-func TestClient_DerivativesExchangesList(t *testing.T) {
+func TestClient_ListAllDerivativeExchangeInfo(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.DerivativesExchangesList(context.Background())
+	data, err := api.ListAllDerivativeExchangeInfo(context.Background())
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call DerivativesExchangesList successfully", "response data", len(*data))
+	slog.Info("call ListAllDerivativeExchangeInfo successfully", "response data", len(*data))
 }
 
-func TestClient_NFTsList(t *testing.T) {
+func TestClient_ListAllNFTInfo(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, count, err := api.NFTsList(context.Background(), "", "", 0, 0)
+	data, count, err := api.ListAllNFTInfo(context.Background(), "", "", 0, 0)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call NFTsList successfully", "response data", data, "count", count)
-
-	b, err := json.Marshal(data)
-	if err != nil {
-		slog.Error("marshal error", "error", err)
-	}
-	err = os.WriteFile("./logs/nfts_list.json", b, 0644)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("json file is saved")
+	slog.Info("call ListAllNFTInfo successfully", "response data", data, "count", count)
 }
 
-func TestClient_NFTsID(t *testing.T) {
+func TestClient_GetDataByNFTID(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.NFTsID(context.Background(), "ag3dnft")
+	data, err := api.GetNFTDataByNFTID(context.Background(), "ag3dnft")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call NFTsID successfully", "response data", data)
-
-	b, err := json.Marshal(data)
-	if err != nil {
-		slog.Error("marshal error", "error", err)
-	}
-	err = os.WriteFile("./logs/nfts_id.json", b, 0644)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("json file is saved")
+	slog.Info("call GetNFTDataByNFTID successfully", "response data", data)
 }
 
-func TestClient_NFTsContract(t *testing.T) {
+func TestClient_GetNFTDataByAssetPlatformIDAndContractAddress(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.NFTsContract(context.Background(), "binance-smart-chain", "0x4bafc595a9ff4a5f4936689a0389c148a65456a2")
+	data, err := api.GetNFTDataByAssetPlatformIDAndContractAddress(context.Background(), "binance-smart-chain", "0x4bafc595a9ff4a5f4936689a0389c148a65456a2")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call NFTsContract successfully", "response data", data)
+	slog.Info("call GetNFTDataByAssetPlatformIDAndContractAddress successfully", "response data", data)
 }
 
-func TestClient_ExchangeRates(t *testing.T) {
+func TestClient_GetExchangeRates(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.ExchangeRates(context.Background())
+	data, err := api.GetExchangeRates(context.Background())
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call ExchangeRates successfully", "response data", data)
+	slog.Info("call GetExchangeRates successfully", "response data", data)
 }
 
 func TestClient_Search(t *testing.T) {
@@ -367,29 +342,29 @@ func TestClient_SearchTrending(t *testing.T) {
 	slog.Info("call SearchTrending successfully", "response data", data)
 }
 
-func TestClient_Global(t *testing.T) {
+func TestClient_GetGlobalCryptocurrencyData(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.Global(context.Background())
+	data, err := api.GetGlobalCryptocurrencyData(context.Background())
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call Global successfully", "response data", data)
+	slog.Info("call GetGlobalCryptocurrencyData successfully", "response data", data)
 }
 
-func TestClient_GlobalDecentralizedFinanceDefi(t *testing.T) {
+func TestClient_GetGlobalTop100DefiData(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.GlobalDecentralizedFinanceDefi(context.Background())
+	data, err := api.GetGlobalTop100DefiData(context.Background())
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call GlobalDecentralizedFinanceDefi successfully", "response data", data)
+	slog.Info("call GetGlobalTop100DefiData successfully", "response data", data)
 }
 
-func TestClient_CompaniesPublicTreasury(t *testing.T) {
+func TestClient_GetCompaniesPublicTreasury(t *testing.T) {
 	api := coingecko.NewCoinGecko(emptyString, nil)
-	data, err := api.CompaniesPublicTreasury(context.Background(), "ethereum")
+	data, err := api.GetCompaniesPublicTreasury(context.Background(), "ethereum")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	slog.Info("call CompaniesPublicTreasury successfully", "response data", (*data).MarketCapDominance)
+	slog.Info("call GetCompaniesPublicTreasury successfully", "response data", (*data).MarketCapDominance)
 }

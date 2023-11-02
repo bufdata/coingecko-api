@@ -9,17 +9,17 @@ import (
 	"strconv"
 )
 
-// CoinsListNew gets the latest 200 coins (id & activated time) that recently listed on CoinGecko.com.
+// ListLatest200Coins gets the latest 200 coins (id & activated time) that recently listed on CoinGecko.com.
 //
 // CoinGecko equivalent page: https://www.coingecko.com/en/new-cryptocurrencies
 // Tips: if you're looking to get the latest coins listed on CoinGecko, this is the best endpoint to do the job.
 //
 // Update frequency: 30 sec.
-func (c *Client) CoinsListNew(ctx context.Context) (*[]CoinsListNewResponse, error) {
+func (c *Client) ListLatest200Coins(ctx context.Context) (*[]CoinsListNewResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, coinsListNewPath)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins list new api", "error", err)
+		slog.Error("failed to send request to list latest 200 coins api", "error", err)
 		return nil, err
 	}
 
@@ -31,9 +31,9 @@ func (c *Client) CoinsListNew(ctx context.Context) (*[]CoinsListNewResponse, err
 	return &data, nil
 }
 
-// CoinsTopGainersLosers gets the top 30 coins with largest price gain and loss by a specific time duration.
+// GetTopGainersLosers gets the top 30 coins with the largest price gain and loss by a specific time duration.
 //
-// CoinGecko equivalent page: https://www.coingecko.com/en/crypto-gainers-losers
+// CoinGecko equivalent page: https://www.coingecko.com/en/crypto-gainers-losers.
 // Note: only coins with at least $50,000 24hour trading volume will be included.
 //
 // Update frequency: 5 minutes.
@@ -47,9 +47,9 @@ func (c *Client) CoinsListNew(ctx context.Context) (*[]CoinsListNewResponse, err
 //
 // top_coins(optional): filter result by MarketCap ranking (top 300 to 1000), or all coins (including coins that do
 // not have MarketCap ranking). Valid values: 300, 500, 1000, all. Default value: 1000.
-func (c *Client) CoinsTopGainersLosers(ctx context.Context, vsCurrency, duration, topCoins string) (*CoinsTopGainersLosersResponse, error) {
+func (c *Client) GetTopGainersLosers(ctx context.Context, vsCurrency, duration, topCoins string) (*CoinsTopGainersLosersResponse, error) {
 	if vsCurrency == "" {
-		return nil, fmt.Errorf("vs currency should not be empty")
+		return nil, fmt.Errorf("vs_currency should not be empty")
 	}
 
 	params := url.Values{}
@@ -64,7 +64,7 @@ func (c *Client) CoinsTopGainersLosers(ctx context.Context, vsCurrency, duration
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, topGainersLoserPath, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins top gainers losers api", "error", err)
+		slog.Error("failed to send request to get top gainers losers api", "error", err)
 		return nil, err
 	}
 
@@ -76,9 +76,9 @@ func (c *Client) CoinsTopGainersLosers(ctx context.Context, vsCurrency, duration
 	return &data, nil
 }
 
-// GlobalMarketCapChart gets historical global market cap and volume data, by number of days away from now.
+// GetGlobalMarketCapChartData gets historical global market cap and volume data, by number of days away from now.
 //
-// CoinGecko equivalent page: https://www.coingecko.com/en/global-charts
+// CoinGecko equivalent page: https://www.coingecko.com/en/global-charts.
 //
 // Data Granularity (auto): 1 day from now = hourly data; 2 days & above from now = daily data (00:00 UTC).
 //
@@ -89,7 +89,7 @@ func (c *Client) CoinsTopGainersLosers(ctx context.Context, vsCurrency, duration
 // days(required): data up to number of days ago. Valid values: any integer e.g. 1, 14, 30 , … or max.
 //
 // vs_currency(optional): filter result by currency. Valid values: jpy, krw, eur, ...
-func (c *Client) GlobalMarketCapChart(ctx context.Context, days, vsCurrency string) (*GlobalMarketCapChartResponse, error) {
+func (c *Client) GetGlobalMarketCapChartData(ctx context.Context, days, vsCurrency string) (*GlobalMarketCapChartResponse, error) {
 	if days == "" {
 		return nil, fmt.Errorf("days should not be empty")
 	}
@@ -115,9 +115,9 @@ func (c *Client) GlobalMarketCapChart(ctx context.Context, days, vsCurrency stri
 	return &data, nil
 }
 
-// NFTsMarkets gets the list of all supported NFT floor price, market cap, volume and market related data on CoinGecko.
+// ListAllNFTsMarketsData gets the list of all supported NFT floor price, market cap, volume and market related data on CoinGecko.
 //
-// CoinGecko equivalent page: https://www.coingecko.com/en/nft
+// CoinGecko equivalent page: https://www.coingecko.com/en/nft.
 //
 // Tips: Other nfts endpoints are also available on our Free API documentation page.
 // By default, this endpoint will return 100 results per page and only 1 page.
@@ -138,7 +138,7 @@ func (c *Client) GlobalMarketCapChart(ctx context.Context, days, vsCurrency stri
 // Max value is 250. You can only get up to 250 results per page.
 //
 // page(optional): page through results. Valid values: any integer e.g. 1, 2, 10, ... Default value: 1.
-func (c *Client) NFTsMarkets(ctx context.Context, assetPlatformID, order string, perPage, page uint) (
+func (c *Client) ListAllNFTsMarketsData(ctx context.Context, assetPlatformID, order string, perPage, page uint) (
 	*[]NFTsMarketsResponse, int, error) {
 	params := url.Values{}
 	if assetPlatformID == "" {
@@ -161,7 +161,7 @@ func (c *Client) NFTsMarkets(ctx context.Context, assetPlatformID, order string,
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, nftsMarketPath, params.Encode())
 	resp, header, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to global market cap chart api", "error", err)
+		slog.Error("failed to send request to list all nft markets api", "error", err)
 		return nil, -1, err
 	}
 
@@ -181,7 +181,7 @@ func (c *Client) NFTsMarkets(ctx context.Context, assetPlatformID, order string,
 	return &data, pageCount, nil
 }
 
-// NFTsIDMarketChart gets historical market data of a NFT collection, including floor price, market cap, and 24h volume,
+// GetMarketChartByNFTID gets historical market data of a NFT collection, including floor price, market cap, and 24h volume,
 // by number of days away from now.
 //
 // CoinGecko equivalent page: our NFT price floor chart, e.g. as seen on https://www.coingecko.com/en/nft/bored-ape-yacht-club
@@ -198,9 +198,9 @@ func (c *Client) NFTsMarkets(ctx context.Context, assetPlatformID, order string,
 // Query parameters:
 //
 // days(required): data up to number of days ago. Valid values: any integer e.g. 1, 14, 30 , 90 , … or max.
-func (c *Client) NFTsIDMarketChart(ctx context.Context, id, days string) (*NFTsIDMarketChartResponse, error) {
+func (c *Client) GetMarketChartByNFTID(ctx context.Context, id, days string) (*NFTsIDMarketChartResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("nft id should not be empty")
 	}
 	if days == "" {
 		return nil, fmt.Errorf("days should not be empty")
@@ -225,7 +225,7 @@ func (c *Client) NFTsIDMarketChart(ctx context.Context, id, days string) (*NFTsI
 	return &data, nil
 }
 
-// NFTsContractMarketChart gets historical market data of a NFT collection using contract address, including floor
+// GetMarketChartByNFTContractAddress gets historical market data of a NFT collection using contract address, including floor
 // price, market cap, and 24h volume, by number of days away from now.
 //
 // CoinGecko equivalent page: our NFT price floor chart, e.g. as seen on  https://www.coingecko.com/en/nft/bored-ape-yacht-club
@@ -247,7 +247,7 @@ func (c *Client) NFTsIDMarketChart(ctx context.Context, id, days string) (*NFTsI
 // Query parameters:
 //
 // days(required): data up to number of days ago. Valid values: any integer e.g. 1, 14, 30 , 90 , … or max.
-func (c *Client) NFTsContractMarketChart(ctx context.Context, assetPlatformID, contractAddress, days string) (
+func (c *Client) GetMarketChartByNFTContractAddress(ctx context.Context, assetPlatformID, contractAddress, days string) (
 	*NFTsIDMarketChartResponse, error) {
 	if assetPlatformID == "" {
 		return nil, fmt.Errorf("asset_platform_id should not be empty")
@@ -275,7 +275,7 @@ func (c *Client) NFTsContractMarketChart(ctx context.Context, assetPlatformID, c
 	return &data, nil
 }
 
-// NFTsIDTickers gets the latest floor price and 24h volume of a NFT collection, on each NFT marketplace, e.g. OpenSea
+// GetNFTTickersByNFTID gets the latest floor price and 24h volume of a NFT collection, on each NFT marketplace, e.g. OpenSea
 // and Looksrare.
 //
 // CoinGecko equivalent page: https://www.coingecko.com/en/nft/otherdeed-for-otherside (table)
@@ -285,9 +285,9 @@ func (c *Client) NFTsContractMarketChart(ctx context.Context, assetPlatformID, c
 // Path parameters:
 //
 // id(required): id of NFT collection. Valid values: cryptopunks, bored-ape-yacht-club, ...
-func (c *Client) NFTsIDTickers(ctx context.Context, id string) (*NFTsIDTickersResponse, error) {
+func (c *Client) GetNFTTickersByNFTID(ctx context.Context, id string) (*NFTsIDTickersResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("nft id should not be empty")
 	}
 
 	path := fmt.Sprintf(nftsTickersPath, id)
@@ -306,7 +306,7 @@ func (c *Client) NFTsIDTickers(ctx context.Context, id string) (*NFTsIDTickersRe
 	return &data, nil
 }
 
-// ExchangesIDVolumeChartRange gets historical volume data (in BTC) of an exchange, by specifying a date range
+// GetVolumeChartRangeByExchangeID gets historical volume data (in BTC) of an exchange, by specifying a date range
 // (up to 31 days per call).
 //
 // CoinGecko equivalent page: https://www.coingecko.com/en/exchanges/binance#statistics (Exchange Trade Volume chart)
@@ -325,9 +325,9 @@ func (c *Client) NFTsIDTickers(ctx context.Context, id string) (*NFTsIDTickersRe
 // from(required): from date in UNIX Timestamp. Valid values: UNIX timestamp e.g. 1672531200.
 //
 // to(required): to date in UNIX Timestamp. Valid values: UNIX timestamp e.g. 1672531200.
-func (c *Client) ExchangesIDVolumeChartRange(ctx context.Context, id string, from, to int64) (*[]ExchangesIDVolumeChartResponse, error) {
+func (c *Client) GetVolumeChartRangeByExchangeID(ctx context.Context, id string, from, to int64) (*[]ExchangesIDVolumeChartResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("exchange id should not be empty")
 	}
 	if from == 0 {
 		return nil, fmt.Errorf("from should not be empty")

@@ -103,9 +103,7 @@ func (c *Client) SimplePrice(ctx context.Context, ids, vsCurrencies []string, in
 //
 // This endpoint allows you to query a token price by using contract address. It returns the global average price that
 // is aggregated across all active exchanges on CoinGecko. It does not return the price of a specific network, you may
-// cross-check the price on CoinGecko.com.
-//
-// Learn more about our price methodology https://www.coingecko.com/en/methodology.
+// cross-check the price on CoinGecko.com. Learn more about our price methodology https://www.coingecko.com/en/methodology.
 //
 // Cache/Update Frequency: every 60 seconds(every 30 seconds for Pro API).
 //
@@ -198,25 +196,24 @@ func (c *Client) SimpleSupportedVSCurrencies(ctx context.Context) (*SimpleSuppor
 	return &data, nil
 }
 
-// CoinsList lists all supported coins id, name and symbol(no pagination required).
+// ListCoinsInfo lists all supported coins id, name and symbol(no pagination required).
 //
-// All the coins that show up on this /coins/list endpoint are Active coins that listed by CoinGecko team on CoinGecko.com
-//
-// If a coin is inactive or deactivated, it will be removed from /coins/list.
+// All the coins that show up on this /coins/list endpoint are Active coins that listed by CoinGecko team on
+// CoinGecko.com. If a coin is inactive or deactivated, it will be removed from /coins/list.
 //
 // Cache/Update Frequency: every 5 minutes.
 //
 // Query parameters:
 //
 // include_platform(optional): flag to include platform contract addresses (eg. 0x.... for Ethereum based tokens).
-// valid values: true, false
-func (c *Client) CoinsList(ctx context.Context, includePlatform bool) (*[]CoinsListResponse, error) {
+// valid values: true, false.
+func (c *Client) ListCoinsInfo(ctx context.Context, includePlatform bool) (*[]CoinsListResponse, error) {
 	params := url.Values{}
 	params.Add("include_platform", strconv.FormatBool(includePlatform))
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, coinsListPath, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins list api", "error", err)
+		slog.Error("failed to send request to list coins info api", "error", err)
 		return nil, err
 	}
 
@@ -228,7 +225,7 @@ func (c *Client) CoinsList(ctx context.Context, includePlatform bool) (*[]CoinsL
 	return &data, nil
 }
 
-// CoinsMarkets lists all supported coins price, market cap,volume and market related data.
+// ListCoinsMarketsData lists all supported coins price, market cap,volume and market related data.
 //
 // Use this to obtain all the coins market data (price, market cap, volume), per page.
 //
@@ -261,7 +258,7 @@ func (c *Client) CoinsList(ctx context.Context, includePlatform bool) (*[]CoinsL
 // pl, pt, ro, ru, sk, sl, sv, th, tr, uk, vi, zh, zh-tw. Default value: en.
 //
 // precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
-func (c *Client) CoinsMarkets(ctx context.Context, vsCurrency string, ids []string, category, order string, perPage, page uint,
+func (c *Client) ListCoinsMarketsData(ctx context.Context, vsCurrency string, ids []string, category, order string, perPage, page uint,
 	sparkline bool, priceChangePercentage []string, locale, precision string) (*[]CoinsMarketsResponse, error) {
 	if vsCurrency == "" {
 		return nil, fmt.Errorf("vs currencies should not be empty")
@@ -304,7 +301,7 @@ func (c *Client) CoinsMarkets(ctx context.Context, vsCurrency string, ids []stri
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, coinsMarketsPath, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to simple token price api", "error", err)
+		slog.Error("failed to send request to list coins market data api", "error", err)
 		return nil, err
 	}
 
@@ -316,7 +313,7 @@ func (c *Client) CoinsMarkets(ctx context.Context, vsCurrency string, ids []stri
 	return &data, nil
 }
 
-// CoinsID gets current data(name, price, market, including exchange tickers) for a coins.
+// GetCoinDataByCoinID gets current data(name, price, market, including exchange tickers) for a coins.
 //
 // IMPORTANT:
 // Ticker <object> is limited to 100 items, to get more tickers, use /coins/{id}/tickers.
@@ -328,13 +325,10 @@ func (c *Client) CoinsMarkets(ctx context.Context, vsCurrency string, ids []stri
 //
 // Dictionary:
 //
-// last: latest unconverted price in the respective pair target currency.
-//
-// volume: unconverted 24h trading volume in the respective pair target currency.
-//
-// converted_last: latest converted price in BTC, ETH, and USD.
-//
-// converted_volume: converted 24h trading volume in BTC, ETH, and USD.
+// [last]: latest unconverted price in the respective pair target currency.
+// [volume]: unconverted 24h trading volume in the respective pair target currency.
+// [converted_last]: latest converted price in BTC, ETH, and USD.
+// [converted_volume]: converted 24h trading volume in BTC, ETH, and USD.
 //
 // Cache/Update Frequency: every 60 seconds.
 //
@@ -355,10 +349,10 @@ func (c *Client) CoinsMarkets(ctx context.Context, vsCurrency string, ids []stri
 // developer_data(optional): include developer_data data (true/false) [default: true].
 //
 // sparkline(optional): include sparkline 7 days data (eg. true, false) [default: false].
-func (c *Client) CoinsID(ctx context.Context, id string, localization, tickers, marketData, communityData,
+func (c *Client) GetCoinDataByCoinID(ctx context.Context, id string, localization, tickers, marketData, communityData,
 	developerData, sparkline bool) (*CoinsIDResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("coin id should not be empty")
 	}
 
 	params := url.Values{}
@@ -373,7 +367,7 @@ func (c *Client) CoinsID(ctx context.Context, id string, localization, tickers, 
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins id api", "error", err)
+		slog.Error("failed to send request to get coin data api", "error", err)
 		return nil, err
 	}
 
@@ -385,22 +379,19 @@ func (c *Client) CoinsID(ctx context.Context, id string, localization, tickers, 
 	return &data, nil
 }
 
-// CoinsIDTickers gets coin tickers (paginated to 100 items).
+// GetCoinTickersByCoinID gets coin tickers (paginated to 100 items).
 //
 // IMPORTANT:
-// Ticker is_stale is true when ticker that has not been updated/unchanged from the exchange for more than 8 hours.
-// Ticker is_anomaly is true if ticker's price is outliered by our system.
+// Ticker <is_stale> is true when ticker that has not been updated/unchanged from the exchange for more than 8 hours.
+// Ticker <is_anomaly> is true if ticker's price is outliered by our system.
 // You are responsible for managing how you want to display these information (e.g. footnote, different background, change opacity, hide)
 //
 // Dictionary:
 //
-// last: latest unconverted price in the respective pair target currency.
-//
-// volume: unconverted 24h trading volume in the respective pair target currency.
-//
-// converted_last: latest converted price in BTC, ETH, and USD.
-//
-// converted_volume: converted 24h trading volume in BTC, ETH, and USD.
+// [last]: latest unconverted price in the respective pair target currency.
+// [volume]: unconverted 24h trading volume in the respective pair target currency.
+// [converted_last]: latest converted price in BTC, ETH, and USD.
+// [converted_volume]: converted 24h trading volume in BTC, ETH, and USD.
 //
 // Cache/Update Frequency: every 2 minutes.
 //
@@ -420,10 +411,10 @@ func (c *Client) CoinsID(ctx context.Context, id string, localization, tickers, 
 //
 // depth(optional): flag to show 2% orderbook depth. i.e., cost_to_move_up_usd and cost_to_move_down_usd. valid
 // values: true, false.
-func (c *Client) CoinsIDTickers(ctx context.Context, id, exchangeIDs string, includeExchangeLogo bool, page uint,
+func (c *Client) GetCoinTickersByCoinID(ctx context.Context, id, exchangeIDs string, includeExchangeLogo bool, page uint,
 	order string, depth bool) (*CoinsIDTickersResponse, int, error) {
 	if id == "" {
-		return nil, -1, fmt.Errorf("id should not be empty")
+		return nil, -1, fmt.Errorf("coin id should not be empty")
 	}
 
 	params := url.Values{}
@@ -443,7 +434,7 @@ func (c *Client) CoinsIDTickers(ctx context.Context, id, exchangeIDs string, inc
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
 	resp, header, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins tickers api", "error", err)
+		slog.Error("failed to send request to get coin tickers api", "error", err)
 		return nil, -1, err
 	}
 
@@ -463,7 +454,7 @@ func (c *Client) CoinsIDTickers(ctx context.Context, id, exchangeIDs string, inc
 	return &data, pageCount, nil
 }
 
-// CoinsIDHistory gets historical data (price, market cap, 24hr volume, ..) at a given date for a coin.
+// GetCoinHistoryDataByCoinID gets historical data (price, market cap, 24hr volume, ..) at a given date for a coin.
 //
 // The data returned is at 00:00:00 UTC.
 // The last completed UTC day (00:00) is available 35 minutes after midnight on the next UTC day (00:35).
@@ -477,9 +468,9 @@ func (c *Client) CoinsIDTickers(ctx context.Context, id, exchangeIDs string, inc
 // date(required): the date of data snapshot in dd-mm-yyyy eg. 30-12-2022.
 //
 // localization(optional): set false to exclude localized languages in response.
-func (c *Client) CoinsIDHistory(ctx context.Context, id, date string, localization bool) (*CoinsIDHistoryResponse, error) {
+func (c *Client) GetCoinHistoryDataByCoinID(ctx context.Context, id, date string, localization bool) (*CoinsIDHistoryResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("coin id should not be empty")
 	}
 	if date == "" {
 		return nil, fmt.Errorf("date should not be empty")
@@ -493,7 +484,7 @@ func (c *Client) CoinsIDHistory(ctx context.Context, id, date string, localizati
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins history api", "error", err)
+		slog.Error("failed to send request to get history data api", "error", err)
 		return nil, err
 	}
 
@@ -505,15 +496,10 @@ func (c *Client) CoinsIDHistory(ctx context.Context, id, date string, localizati
 	return &data, nil
 }
 
-// CoinsIDMarketChart gets historical market data include price, market cap, and 24h volume (granularity auto).
+// GetCoinMarketChartByCoinID gets historical market data include price, market cap, and 24h volume (granularity auto).
 //
-// Data granularity is automatic (cannot be adjusted):
-//
-// 1 day from current time = 5 minute interval data.
-//
-// 2-90 days from current time = hourly data.
-//
-// above 90 days from current time = daily data (00:00 UTC).
+// Data granularity is automatic (cannot be adjusted): 1 day from current time = 5 minute interval data;
+// 2-90 days from current time = hourly data; above 90 days from current time = daily data (00:00 UTC).
 //
 // Cache/Update Frequency: every 5 minutes.
 //
@@ -534,10 +520,10 @@ func (c *Client) CoinsIDHistory(ctx context.Context, id, date string, localizati
 // interval(optional): data interval. Possible value: daily.
 //
 // precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
-func (c *Client) CoinsIDMarketChart(ctx context.Context, id, vsCurrency, days, interval, precision string) (
+func (c *Client) GetCoinMarketChartByCoinID(ctx context.Context, id, vsCurrency, days, interval, precision string) (
 	*CoinsIDMarketChartResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("coin id should not be empty")
 	}
 	if vsCurrency == "" {
 		return nil, fmt.Errorf("vs_currency should not be empty")
@@ -560,7 +546,7 @@ func (c *Client) CoinsIDMarketChart(ctx context.Context, id, vsCurrency, days, i
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins market chart api", "error", err)
+		slog.Error("failed to send request to get coin market chart api", "error", err)
 		return nil, err
 	}
 
@@ -572,15 +558,10 @@ func (c *Client) CoinsIDMarketChart(ctx context.Context, id, vsCurrency, days, i
 	return &data, nil
 }
 
-// CoinsIDMarketChartRange gets historical market data include price, market cap, and 24h volume (granularity auto).
+// GetCoinMarketChartRangeByCoinID gets historical market data include price, market cap, and 24h volume (granularity auto).
 //
-// Data granularity is automatic (cannot be adjusted):
-//
-// 1 day from current time = 5 minute interval data.
-//
-// 2-90 days from current time = hourly data.
-//
-// above 90 days from current time = daily data (00:00 UTC).
+// Data granularity is automatic (cannot be adjusted): 1 day from current time = 5 minute interval data;
+// 2-90 days from current time = hourly data; above 90 days from current time = daily data (00:00 UTC).
 //
 // Cache/Update Frequency: every 5 minutes.
 //
@@ -601,10 +582,10 @@ func (c *Client) CoinsIDMarketChart(ctx context.Context, id, vsCurrency, days, i
 // to(required): to date in UNIX Timestamp (eg. 1422577232).
 //
 // precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
-func (c *Client) CoinsIDMarketChartRange(ctx context.Context, id, vsCurrency, from, to, precision string) (
+func (c *Client) GetCoinMarketChartRangeByCoinID(ctx context.Context, id, vsCurrency, from, to, precision string) (
 	*CoinsIDMarketChartResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("coin id should not be empty")
 	}
 	if vsCurrency == "" {
 		return nil, fmt.Errorf("vs_currency should not be empty")
@@ -628,7 +609,7 @@ func (c *Client) CoinsIDMarketChartRange(ctx context.Context, id, vsCurrency, fr
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins market chart range api", "error", err)
+		slog.Error("failed to send request to get market chart range api", "error", err)
 		return nil, err
 	}
 
@@ -640,19 +621,13 @@ func (c *Client) CoinsIDMarketChartRange(ctx context.Context, id, vsCurrency, fr
 	return &data, nil
 }
 
-// CoinsIDOHLC gets coin's OHLC.
+// GetCoinOHLCByCoinID gets coin's OHLC.
 //
 // Candle's body - data granularity is automatic (cannot be adjusted for public api users):
+// 1-2 days: 30 minutes; 3-30 days: 4 hours; 31 days and beyond: 4 days/.
 //
-// 1-2 days: 30 minutes.
-//
-// 3-30 days: 4 hours.
-//
-// 31 days and beyond: 4 days/
-//
-// Daily candle interval parameter is available for paid plan users only (Analyst/Lite/Pro/Enterprise), use interval=daily parameter in your request:
-//
-// 'daily' interval: available for 1/7/14/30/90/180 days/
+// Daily candle interval parameter is available for paid plan users only (Analyst/Lite/Pro/Enterprise), use
+// interval=daily parameter in your request: 'daily' interval: available for 1/7/14/30/90/180 days/.
 //
 // Cache/Update Frequency: every 30 minutes.
 //
@@ -669,9 +644,9 @@ func (c *Client) CoinsIDMarketChartRange(ctx context.Context, id, vsCurrency, fr
 // days(required): data up to number of days ago (1/7/14/30/90/180/365/max).
 //
 // precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
-func (c *Client) CoinsIDOHLC(ctx context.Context, id, vsCurrency, days, precision string) (*[]CoinsOHLCResponse, error) {
+func (c *Client) GetCoinOHLCByCoinID(ctx context.Context, id, vsCurrency, days, precision string) (*[]CoinsOHLCResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("coin id should not be empty")
 	}
 	if vsCurrency == "" {
 		return nil, fmt.Errorf("vs_currency should not be empty")
@@ -691,7 +666,7 @@ func (c *Client) CoinsIDOHLC(ctx context.Context, id, vsCurrency, days, precisio
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins ohlc api", "error", err)
+		slog.Error("failed to send request to get coin ohlc api", "error", err)
 		return nil, err
 	}
 
@@ -703,7 +678,7 @@ func (c *Client) CoinsIDOHLC(ctx context.Context, id, vsCurrency, days, precisio
 	return &data, nil
 }
 
-// CoinsContract gets coin info from contract address.
+// GetCoinInfoByContractAddress gets coin info from contract address.
 //
 // Cache/Update Frequency: every 60 seconds.
 //
@@ -712,19 +687,19 @@ func (c *Client) CoinsIDOHLC(ctx context.Context, id, vsCurrency, days, precisio
 // id(required): asset platform (See asset_platforms endpoint for list of options).
 //
 // contract_address(required): token's contract address.
-func (c *Client) CoinsContract(ctx context.Context, id, contractAddress string) (*CoinsContractResponse, error) {
+func (c *Client) GetCoinInfoByContractAddress(ctx context.Context, id, contractAddress string) (*CoinsContractResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("id should not be empty")
 	}
 	if contractAddress == "" {
-		return nil, fmt.Errorf("contract address should not be empty")
+		return nil, fmt.Errorf("contract_address should not be empty")
 	}
 
 	path := fmt.Sprintf(coinsContractPath, id, contractAddress)
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, path)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins contract api", "error", err)
+		slog.Error("failed to send request to get coin info api", "error", err)
 		return nil, err
 	}
 
@@ -736,16 +711,11 @@ func (c *Client) CoinsContract(ctx context.Context, id, contractAddress string) 
 	return &data, nil
 }
 
-// CoinsContractMarketChart Get historical market data include price, market cap, and 24h volume (granularity auto)
+// GetMarketChartByContractAddress Get historical market data include price, market cap, and 24h volume (granularity auto)
 // from a contract address.
 //
-// Data granularity is automatic (cannot be adjusted):
-//
-// 1 day from current time = 5 minute interval data.
-//
-// 2-90 days from current time = hourly data.
-//
-// above 90 days from current time = daily data (00:00 UTC).
+// Data granularity is automatic (cannot be adjusted): 1 day from current time = 5 minute interval data;
+// 2-90 days from current time = hourly data; above 90 days from current time = daily data (00:00 UTC).
 //
 // Cache/Update Frequency: every 5 minutes.
 //
@@ -764,16 +734,16 @@ func (c *Client) CoinsContract(ctx context.Context, id, contractAddress string) 
 // days(required): data up to number of days ago (eg. 1,14,30,max).
 //
 // precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
-func (c *Client) CoinsContractMarketChart(ctx context.Context, id, contractAddress, vsCurrency, days, precision string) (
+func (c *Client) GetMarketChartByContractAddress(ctx context.Context, id, contractAddress, vsCurrency, days, precision string) (
 	*CoinsContractMarketChartResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("asset_platform id should not be empty")
 	}
 	if contractAddress == "" {
-		return nil, fmt.Errorf("contract address should not be empty")
+		return nil, fmt.Errorf("contract_address should not be empty")
 	}
 	if vsCurrency == "" {
-		return nil, fmt.Errorf("vs currency should not be empty")
+		return nil, fmt.Errorf("vs_currency should not be empty")
 	}
 	if days == "" {
 		return nil, fmt.Errorf("days should not be empty")
@@ -790,7 +760,7 @@ func (c *Client) CoinsContractMarketChart(ctx context.Context, id, contractAddre
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins contract market chart api", "error", err)
+		slog.Error("failed to send request to get market chart api", "error", err)
 		return nil, err
 	}
 
@@ -802,16 +772,11 @@ func (c *Client) CoinsContractMarketChart(ctx context.Context, id, contractAddre
 	return &data, nil
 }
 
-// CoinsContractMarketChartRange Get historical market data include price, market cap, and 24h volume (granularity auto)
+// GetMarketChartRangeByContractAddress Get historical market data include price, market cap, and 24h volume (granularity auto)
 // from a contract address.
 //
-// Data granularity is automatic (cannot be adjusted):
-//
-// 1 day from current time = 5 minute interval data.
-//
-// 2-90 days from current time = hourly data.
-//
-// above 90 days from current time = daily data (00:00 UTC).
+// Data granularity is automatic (cannot be adjusted): 1 day from current time = 5 minute interval data;
+// 2-90 days from current time = hourly data; above 90 days from current time = daily data (00:00 UTC).
 //
 // Cache/Update Frequency: every 5 minutes.
 //
@@ -832,16 +797,16 @@ func (c *Client) CoinsContractMarketChart(ctx context.Context, id, contractAddre
 // to(required): to date in UNIX Timestamp (eg. 1422577232).
 //
 // precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
-func (c *Client) CoinsContractMarketChartRange(ctx context.Context, id, contractAddress, vsCurrency, from, to,
+func (c *Client) GetMarketChartRangeByContractAddress(ctx context.Context, id, contractAddress, vsCurrency, from, to,
 	precision string) (*CoinsContractMarketChartResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("asset_platform id should not be empty")
 	}
 	if contractAddress == "" {
-		return nil, fmt.Errorf("contract address should not be empty")
+		return nil, fmt.Errorf("contract_address should not be empty")
 	}
 	if vsCurrency == "" {
-		return nil, fmt.Errorf("vs currency should not be empty")
+		return nil, fmt.Errorf("vs_currency should not be empty")
 	}
 	if from == "" {
 		return nil, fmt.Errorf("from should not be empty")
@@ -862,7 +827,7 @@ func (c *Client) CoinsContractMarketChartRange(ctx context.Context, id, contract
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins contract market chart range api", "error", err)
+		slog.Error("failed to send request to get market chart range api", "error", err)
 		return nil, err
 	}
 
@@ -879,7 +844,7 @@ func (c *Client) CoinsContractMarketChartRange(ctx context.Context, id, contract
 // Query parameters:
 //
 // filter(optional): apply relevant filters to results; valid values: "nft" (asset_platform nft-support).
-func (c *Client) AssetPlatforms(ctx context.Context, filter string) (*[]AssetPlatformsResponse, error) {
+func (c *Client) ListAllAssetPlatforms(ctx context.Context, filter string) (*[]AssetPlatformsResponse, error) {
 	var params url.Values
 	if filter != "" {
 		params.Add("filter", filter)
@@ -894,7 +859,7 @@ func (c *Client) AssetPlatforms(ctx context.Context, filter string) (*[]AssetPla
 
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to asset platforms api", "error", err)
+		slog.Error("failed to send request to list all asset platforms api", "error", err)
 		return nil, err
 	}
 
@@ -906,14 +871,14 @@ func (c *Client) AssetPlatforms(ctx context.Context, filter string) (*[]AssetPla
 	return &data, nil
 }
 
-// CoinsCategoriesList lists all categories.
+// ListAllCategories lists all categories.
 //
 // Cache/Update Frequency: every 5 minutes.
-func (c *Client) CoinsCategoriesList(ctx context.Context) (*[]CoinsCategoriesListResponse, error) {
+func (c *Client) ListAllCategories(ctx context.Context) (*[]CoinsCategoriesListResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, coinsCategoriesListPath)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins categories list api", "error", err)
+		slog.Error("failed to send request to list all categories api", "error", err)
 		return nil, err
 	}
 
@@ -925,7 +890,7 @@ func (c *Client) CoinsCategoriesList(ctx context.Context) (*[]CoinsCategoriesLis
 	return &data, nil
 }
 
-// CoinsCategories lists all categories with market data.
+// ListAllCategoriesWithMarketData lists all categories with market data.
 //
 // Cache/Update Frequency: every 5 minutes.
 //
@@ -933,7 +898,7 @@ func (c *Client) CoinsCategoriesList(ctx context.Context) (*[]CoinsCategoriesLis
 //
 // order(optional): valid values: market_cap_desc(default), market_cap_asc, name_desc, name_asc,
 // market_cap_change_24h_desc, market_cap_change_24h_asc.
-func (c *Client) CoinsCategories(ctx context.Context, order string) (*[]CoinsCategoriesResponse, error) {
+func (c *Client) ListAllCategoriesWithMarketData(ctx context.Context, order string) (*[]CoinsCategoriesResponse, error) {
 	params := url.Values{}
 	if order == "" {
 		params.Add("order", "market_cap_desc")
@@ -942,7 +907,7 @@ func (c *Client) CoinsCategories(ctx context.Context, order string) (*[]CoinsCat
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, coinsCategoriesPath, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to coins categories api", "error", err)
+		slog.Error("failed to send request to list all categories with market data api", "error", err)
 		return nil, err
 	}
 
@@ -954,7 +919,7 @@ func (c *Client) CoinsCategories(ctx context.Context, order string) (*[]CoinsCat
 	return &data, nil
 }
 
-// Exchanges lists all exchanges(active with trading volumes).
+// ListAllExchanges lists all exchanges(active with trading volumes).
 //
 // Cache/Update Frequency: every 60 seconds.
 //
@@ -963,7 +928,7 @@ func (c *Client) CoinsCategories(ctx context.Context, order string) (*[]CoinsCat
 // per_page(optional): Valid values: 1...250; total results per page. Default value: 100.
 //
 // page(optional): page through results.
-func (c *Client) Exchanges(ctx context.Context, perPage, page uint) (*[]ExchangesResponse, int, error) {
+func (c *Client) ListAllExchanges(ctx context.Context, perPage, page uint) (*[]ExchangesResponse, int, error) {
 	params := url.Values{}
 	if perPage == 0 {
 		perPage = 100
@@ -975,10 +940,9 @@ func (c *Client) Exchanges(ctx context.Context, perPage, page uint) (*[]Exchange
 	params.Add("page", strconv.Itoa(int(page)))
 
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, exchangesPath, params.Encode())
-	fmt.Println(endpoint)
 	resp, header, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to exchanges api", "error", err)
+		slog.Error("failed to send request to list all exchanges api", "error", err)
 		return nil, -1, err
 	}
 
@@ -998,16 +962,16 @@ func (c *Client) Exchanges(ctx context.Context, perPage, page uint) (*[]Exchange
 	return &data, pageCount, nil
 }
 
-// ExchangesList lists all supported markets id and name(no pagination required).
+// ListAllMarketsInfo lists all supported markets id and name(no pagination required).
 //
 // Use this to obtain all the markets' id in order to make API calls.
 //
 // Cache/Update Frequency: every 5 minutes.
-func (c *Client) ExchangesList(ctx context.Context) (*[]ExchangesListResponse, error) {
+func (c *Client) ListAllMarketsInfo(ctx context.Context) (*[]ExchangesListResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, exchangesListPath)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to exchanges list api", "error", err)
+		slog.Error("failed to send request to list all markets info api", "error", err)
 		return nil, err
 	}
 
@@ -1019,7 +983,7 @@ func (c *Client) ExchangesList(ctx context.Context) (*[]ExchangesListResponse, e
 	return &data, nil
 }
 
-// ExchangesID gets exchange volume in BTC and top 100 tickers only.
+// GetExchangeVolumeAndTickersByExchangeID gets exchange volume in BTC and top 100 tickers only.
 //
 // For derivatives (e.g. bitmex, binance_futures), please use /derivatives/exchange/{id} endpoint.
 //
@@ -1032,29 +996,26 @@ func (c *Client) ExchangesList(ctx context.Context) (*[]ExchangesListResponse, e
 //
 // Dictionary:
 //
-// last: latest unconverted price in the respective pair target currency.
-//
-// volume: unconverted 24h trading volume in the respective pair target currency.
-//
-// converted_last: latest converted price in BTC, ETH, and USD.
-//
-// converted_volume: converted 24h trading volume in BTC, ETH, and USD.
+// [last]: latest unconverted price in the respective pair target currency.
+// [volume]: unconverted 24h trading volume in the respective pair target currency.
+// [converted_last]: latest converted price in BTC, ETH, and USD.
+// [converted_volume]: converted 24h trading volume in BTC, ETH, and USD.
 //
 // Cache/Update Frequency: every 60 seconds.
 //
 // Path parameters:
 //
 // id(required): pass the exchange id(can be obtained from /exchanges/list) eg. binance.
-func (c *Client) ExchangesID(ctx context.Context, id string) (*ExchangesIDResponse, error) {
+func (c *Client) GetExchangeVolumeAndTickersByExchangeID(ctx context.Context, id string) (*ExchangesIDResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("exchange id should not be empty")
 	}
 
 	path := fmt.Sprintf(exchangesIDPath, id)
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, path)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to exchanges id api", "error", err)
+		slog.Error("failed to send request to get volume and tickers api", "error", err)
 		return nil, err
 	}
 
@@ -1066,7 +1027,7 @@ func (c *Client) ExchangesID(ctx context.Context, id string) (*ExchangesIDRespon
 	return &data, nil
 }
 
-// ExchangesIDTickers gets exchange tickers (paginated, 100 tickers per page).
+// GetExchangeTickersByExchangeID gets exchange tickers (paginated, 100 tickers per page).
 //
 // For derivatives (e.g. bitmex, binance_futures), please use /derivatives/exchange/{id} endpoint.
 //
@@ -1078,13 +1039,10 @@ func (c *Client) ExchangesID(ctx context.Context, id string) (*ExchangesIDRespon
 //
 // Dictionary:
 //
-// last: latest unconverted price in the respective pair target currency.
-//
-// volume: unconverted 24h trading volume in the respective pair target currency.
-//
-// converted_last: latest converted price in BTC, ETH, and USD.
-//
-// converted_volume: converted 24h trading volume in BTC, ETH, and USD.
+// [last]: latest unconverted price in the respective pair target currency.
+// [volume]: unconverted 24h trading volume in the respective pair target currency.
+// [converted_last]: latest converted price in BTC, ETH, and USD.
+// [converted_volume]: converted 24h trading volume in BTC, ETH, and USD.
 //
 // Cache/Update Frequency: every 60 seconds.
 //
@@ -1104,10 +1062,10 @@ func (c *Client) ExchangesID(ctx context.Context, id string) (*ExchangesIDRespon
 // Valid values: true, false.
 //
 // order(optional): valid values: trust_score_desc (default), trust_score_asc and volume_desc.
-func (c *Client) ExchangesIDTickers(ctx context.Context, id, coinIDs string, includeExchangeLogo bool, page uint, depth bool,
+func (c *Client) GetExchangeTickersByExchangeID(ctx context.Context, id, coinIDs string, includeExchangeLogo bool, page uint, depth bool,
 	order string) (*ExchangesIDTickersResponse, int, error) {
 	if id == "" {
-		return nil, -1, fmt.Errorf("id should not be empty")
+		return nil, -1, fmt.Errorf("exchange id should not be empty")
 	}
 
 	params := url.Values{}
@@ -1129,7 +1087,7 @@ func (c *Client) ExchangesIDTickers(ctx context.Context, id, coinIDs string, inc
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
 	resp, header, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to exchanges id tickers api", "error", err)
+		slog.Error("failed to send request to get exchange tickers api", "error", err)
 		return nil, -1, err
 	}
 
@@ -1149,15 +1107,9 @@ func (c *Client) ExchangesIDTickers(ctx context.Context, id, coinIDs string, inc
 	return &data, pageCount, nil
 }
 
-// ExchangesIDVolumeChart gets volume_chart data (in BTC) for a given exchange.
+// GetExchangeVolumeChartByExchangeID gets volume_chart data (in BTC) for a given exchange.
 //
-// Data granularity is automatic(cannot be adjusted):
-//
-// 1 day = 10-minutely.
-//
-// 2-90 days = hourly.
-//
-// 91 days above = daily.
+// Data granularity is automatic(cannot be adjusted): 1 day = 10-minutely; 2-90 days = hourly; 91 days above = daily.
 //
 // Note: exclusive endpoint is available for paid users to query more than 1 year of historical data.
 //
@@ -1170,9 +1122,9 @@ func (c *Client) ExchangesIDTickers(ctx context.Context, id, coinIDs string, inc
 // Query parameters:
 //
 // days(required): data up to number of days ago (1/7/14/30/90/180/365).
-func (c *Client) ExchangesIDVolumeChart(ctx context.Context, id string, days uint) (*[]ExchangesIDVolumeChartResponse, error) {
+func (c *Client) GetExchangeVolumeChartByExchangeID(ctx context.Context, id string, days uint) (*[]ExchangesIDVolumeChartResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("exchange id should not be empty")
 	}
 
 	params := url.Values{}
@@ -1182,7 +1134,7 @@ func (c *Client) ExchangesIDVolumeChart(ctx context.Context, id string, days uin
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, path, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to exchanges id volume chart api", "error", err)
+		slog.Error("failed to send request to get volume chart api", "error", err)
 		return nil, err
 	}
 
@@ -1194,7 +1146,7 @@ func (c *Client) ExchangesIDVolumeChart(ctx context.Context, id string, days uin
 	return &data, nil
 }
 
-// Derivatives lists all derivative tickers.
+// ListAllDerivativesTickers lists all derivative tickers.
 //
 // Note: 'open_interest' and 'volume_24h' data are in USD.
 //
@@ -1204,7 +1156,7 @@ func (c *Client) ExchangesIDVolumeChart(ctx context.Context, id string, days uin
 //
 // include_tickers(optional): ['all', 'unexpired'] - expired to show unexpired tickers, all to list all tickers;
 // defaults to unexpired.
-func (c *Client) Derivatives(ctx context.Context, includeTickers string) (*[]DerivativesResponse, error) {
+func (c *Client) ListAllDerivativesTickers(ctx context.Context, includeTickers string) (*[]DerivativesResponse, error) {
 	params := url.Values{}
 	if includeTickers == "" {
 		params.Add("include_tickers", "unexpired")
@@ -1215,7 +1167,7 @@ func (c *Client) Derivatives(ctx context.Context, includeTickers string) (*[]Der
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, derivativesPath, params.Encode())
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to derivatives api", "error", err)
+		slog.Error("failed to send request to list all derivatives tickers api", "error", err)
 		return nil, err
 	}
 
@@ -1227,7 +1179,7 @@ func (c *Client) Derivatives(ctx context.Context, includeTickers string) (*[]Der
 	return &data, nil
 }
 
-// DerivativesExchanges lists all derivative exchanges.
+// ListAllDerivativesExchanges lists all derivative exchanges.
 //
 // Cache/Update Frequency: every 30 seconds.
 //
@@ -1239,7 +1191,7 @@ func (c *Client) Derivatives(ctx context.Context, includeTickers string) (*[]Der
 // per_page: total results per page.
 //
 // page(optional): page through results.
-func (c *Client) DerivativesExchanges(ctx context.Context, order string, perPage, page uint) (
+func (c *Client) ListAllDerivativesExchanges(ctx context.Context, order string, perPage, page uint) (
 	*[]DerivativesExchangesResponse, int, error) {
 	params := url.Values{}
 	if order == "" {
@@ -1259,7 +1211,7 @@ func (c *Client) DerivativesExchanges(ctx context.Context, order string, perPage
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, derivativesExchangesPath, params.Encode())
 	resp, header, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to derivatives exchanges api", "error", err)
+		slog.Error("failed to send request to list all derivatives exchanges api", "error", err)
 		return nil, -1, err
 	}
 
@@ -1279,7 +1231,7 @@ func (c *Client) DerivativesExchanges(ctx context.Context, order string, perPage
 	return &data, pageCount, nil
 }
 
-// DerivativesExchangesID shows derivative exchange data.
+// ListDerivativesExchangeData shows derivative exchange data.
 //
 // Dictionary:
 //
@@ -1298,9 +1250,9 @@ func (c *Client) DerivativesExchanges(ctx context.Context, order string, perPage
 //
 // include_tickers(optional): ['all', 'unexpired'] - expired to show unexpired tickers, all to list all tickers,
 // leave blank to omit tickers data in response.
-func (c *Client) DerivativesExchangesID(ctx context.Context, id, includeTickers string) (*DerivativesExchangesIDResponse, error) {
+func (c *Client) ListDerivativesExchangeData(ctx context.Context, id, includeTickers string) (*DerivativesExchangesIDResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("exchange id should not be empty")
 	}
 
 	params := url.Values{}
@@ -1317,7 +1269,7 @@ func (c *Client) DerivativesExchangesID(ctx context.Context, id, includeTickers 
 	}
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to derivatives exchanges id api", "error", err)
+		slog.Error("failed to send request to list derivatives exchange data api", "error", err)
 		return nil, err
 	}
 
@@ -1329,14 +1281,14 @@ func (c *Client) DerivativesExchangesID(ctx context.Context, id, includeTickers 
 	return &data, nil
 }
 
-// DerivativesExchangesList lists all derivative exchanges name and identifier.
+// ListAllDerivativeExchangeInfo lists all derivative exchanges name and identifier.
 //
 // Cache/Update Frequency: every 5 minutes.
-func (c *Client) DerivativesExchangesList(ctx context.Context) (*[]DerivativesExchangesListResponse, error) {
+func (c *Client) ListAllDerivativeExchangeInfo(ctx context.Context) (*[]DerivativesExchangesListResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, derivativesListPath)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to derivatives exchanges list api", "error", err)
+		slog.Error("failed to send request to list all derivative exchange info api", "error", err)
 		return nil, err
 	}
 
@@ -1348,7 +1300,7 @@ func (c *Client) DerivativesExchangesList(ctx context.Context) (*[]DerivativesEx
 	return &data, nil
 }
 
-// NFTsList lists all supported NFT ids, paginated by 100 items per page, paginated to 100 items.
+// ListAllNFTInfo lists all supported NFT ids, paginated by 100 items per page, paginated to 100 items.
 //
 // Use this to obtain all the NFT ids in order to make API calls, paginated to 100 items.
 //
@@ -1364,7 +1316,7 @@ func (c *Client) DerivativesExchangesList(ctx context.Context) (*[]DerivativesEx
 // per_page(optional): valid values: 1..250; total results per page; example: 100.
 //
 // page(optional): page through results; example: 1.
-func (c *Client) NFTsList(ctx context.Context, order, assetPlatformID string, perPage, page uint) (*[]NFTsListResponse, int, error) {
+func (c *Client) ListAllNFTInfo(ctx context.Context, order, assetPlatformID string, perPage, page uint) (*[]NFTsListResponse, int, error) {
 	params := url.Values{}
 	if order != "" {
 		params.Add("order", order)
@@ -1384,7 +1336,7 @@ func (c *Client) NFTsList(ctx context.Context, order, assetPlatformID string, pe
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, nftsListPath, params.Encode())
 	resp, header, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to nfts list api", "error", err)
+		slog.Error("failed to send request to list all nft info api", "error", err)
 		return nil, -1, err
 	}
 
@@ -1404,7 +1356,7 @@ func (c *Client) NFTsList(ctx context.Context, order, assetPlatformID string, pe
 	return &data, pageCount, nil
 }
 
-// NFTsID gets current data (name, price_floor, volume_24h ...) for an NFT collection. native_currency (string) is
+// GetNFTDataByNFTID gets current data (name, price_floor, volume_24h ...) for an NFT collection. native_currency (string) is
 // only a representative of the currency.
 //
 // Cache/Update Frequency: every 60 seconds.
@@ -1412,16 +1364,16 @@ func (c *Client) NFTsList(ctx context.Context, order, assetPlatformID string, pe
 // Path parameters:
 //
 // id(required): id of nft collection (can be obtained from /nfts/list).
-func (c *Client) NFTsID(ctx context.Context, id string) (*NFTsIDResponse, error) {
+func (c *Client) GetNFTDataByNFTID(ctx context.Context, id string) (*NFTsIDResponse, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id should not be empty")
+		return nil, fmt.Errorf("nft id should not be empty")
 	}
 
 	path := fmt.Sprintf(nftsIDPath, id)
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, path)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to nfts id api", "error", err)
+		slog.Error("failed to send request to get nft data api", "error", err)
 		return nil, err
 	}
 
@@ -1433,7 +1385,7 @@ func (c *Client) NFTsID(ctx context.Context, id string) (*NFTsIDResponse, error)
 	return &data, nil
 }
 
-// NFTsContract gets current data (name, price_floor, volume_24h ...) for an NFT collection.
+// GetNFTDataByAssetPlatformIDAndContractAddress gets current data (name, price_floor, volume_24h ...) for an NFT collection.
 // *Solana NFT & Art Blocks are not supported for this endpoint, please use /nfts/{id} endpoint instead.
 //
 // Cache/Update Frequency: every 60 seconds.
@@ -1444,7 +1396,8 @@ func (c *Client) NFTsID(ctx context.Context, id string) (*NFTsIDResponse, error)
 // options, use filter=nft param).
 //
 // contract_address(required): the contract_address of the nft collection (/nfts/list for list of nft collection with metadata).
-func (c *Client) NFTsContract(ctx context.Context, assetPlatformID, contractAddress string) (*NFTsIDResponse, error) {
+func (c *Client) GetNFTDataByAssetPlatformIDAndContractAddress(ctx context.Context, assetPlatformID, contractAddress string) (
+	*NFTsIDResponse, error) {
 	if assetPlatformID == "" {
 		return nil, fmt.Errorf("asset_platform_id should not be empty")
 	}
@@ -1456,7 +1409,7 @@ func (c *Client) NFTsContract(ctx context.Context, assetPlatformID, contractAddr
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, path)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to nfts contract api", "error", err)
+		slog.Error("failed to send request to get nft data api", "error", err)
 		return nil, err
 	}
 
@@ -1468,14 +1421,14 @@ func (c *Client) NFTsContract(ctx context.Context, assetPlatformID, contractAddr
 	return &data, nil
 }
 
-// ExchangeRates gets BTC-to-Currency exchange rates.
+// GetExchangeRates gets BTC-to-Currency exchange rates.
 //
 // Cache/Update Frequency: every 60 seconds.
-func (c *Client) ExchangeRates(ctx context.Context) (*ExchangeRatesResponse, error) {
+func (c *Client) GetExchangeRates(ctx context.Context) (*ExchangeRatesResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, exchangeRatesPath)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to exchange rates api", "error", err)
+		slog.Error("failed to send request to get exchange rates api", "error", err)
 		return nil, err
 	}
 
@@ -1540,14 +1493,14 @@ func (c *Client) SearchTrending(ctx context.Context) (*SearchTrendingResponse, e
 	return &data, nil
 }
 
-// Global gets cryptocurrency global data.
+// GetGlobalCryptocurrencyData gets cryptocurrency global data.
 //
 // Cache/Update Frequency: every 10 minutes.
-func (c *Client) Global(ctx context.Context) (*GlobalResponse, error) {
+func (c *Client) GetGlobalCryptocurrencyData(ctx context.Context) (*GlobalResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, globalPath)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to global api", "error", err)
+		slog.Error("failed to send request to get global cryptocurrency data api", "error", err)
 		return nil, err
 	}
 
@@ -1559,14 +1512,14 @@ func (c *Client) Global(ctx context.Context) (*GlobalResponse, error) {
 	return &data, nil
 }
 
-// GlobalDecentralizedFinanceDefi gets Top 100 Cryptocurrency Global Decentralized Finance(defi) data.
+// GetGlobalDefiData gets Top 100 Cryptocurrency Global Decentralized Finance(defi) data.
 //
 // Cache/Update Frequency: every 60 minutes.
-func (c *Client) GlobalDecentralizedFinanceDefi(ctx context.Context) (*GlobalDefiResponse, error) {
+func (c *Client) GetGlobalTop100DefiData(ctx context.Context) (*GlobalDefiResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, globalDefi)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to global defi api", "error", err)
+		slog.Error("failed to send request to get global top 100 defi data api", "error", err)
 		return nil, err
 	}
 
@@ -1578,12 +1531,12 @@ func (c *Client) GlobalDecentralizedFinanceDefi(ctx context.Context) (*GlobalDef
 	return &data, nil
 }
 
-// CompaniesPublicTreasury gets public companies bitcoin or ethereum holdings (Ordered by total holdings descending).
+// GetCompaniesPublicTreasury gets public companies bitcoin or ethereum holdings (Ordered by total holdings descending).
 //
 // Path parameters:
 //
 // coin_id(required): bitcoin or ethereum.
-func (c *Client) CompaniesPublicTreasury(ctx context.Context, coinID string) (*CompaniesPublicTreasuryResponse, error) {
+func (c *Client) GetCompaniesPublicTreasury(ctx context.Context, coinID string) (*CompaniesPublicTreasuryResponse, error) {
 	if coinID == "" {
 		return nil, fmt.Errorf("coin id should be empty")
 	}
@@ -1592,7 +1545,7 @@ func (c *Client) CompaniesPublicTreasury(ctx context.Context, coinID string) (*C
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, path)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
-		slog.Error("failed to send request to companies public treasury api", "error", err)
+		slog.Error("failed to send request to get companies public treasury api", "error", err)
 		return nil, err
 	}
 
