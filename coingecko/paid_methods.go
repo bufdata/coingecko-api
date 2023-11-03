@@ -15,7 +15,7 @@ import (
 // Tips: if you're looking to get the latest coins listed on CoinGecko, this is the best endpoint to do the job.
 //
 // Update frequency: 30 sec.
-func (c *Client) ListLatest200Coins(ctx context.Context) (*[]CoinsListNewResponse, error) {
+func (c *Client) ListLatest200Coins(ctx context.Context) (*[]ListLatest200CoinsResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, coinsListNewPath)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
@@ -23,7 +23,7 @@ func (c *Client) ListLatest200Coins(ctx context.Context) (*[]CoinsListNewRespons
 		return nil, err
 	}
 
-	var data []CoinsListNewResponse
+	var data []ListLatest200CoinsResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins list new response", "error", err)
 		return nil, err
@@ -285,7 +285,7 @@ func (c *Client) GetMarketChartByNFTContractAddress(ctx context.Context, assetPl
 // Path parameters:
 //
 // id(required): id of NFT collection. Valid values: cryptopunks, bored-ape-yacht-club, ...
-func (c *Client) GetNFTTickersByNFTID(ctx context.Context, id string) (*NFTsIDTickersResponse, error) {
+func (c *Client) GetNFTTickersByNFTID(ctx context.Context, id string) (*NFTTickersResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("nft id should not be empty")
 	}
@@ -298,7 +298,7 @@ func (c *Client) GetNFTTickersByNFTID(ctx context.Context, id string) (*NFTsIDTi
 		return nil, err
 	}
 
-	var data NFTsIDTickersResponse
+	var data NFTTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal nfts id tickers response", "error", err)
 		return nil, err
@@ -325,7 +325,7 @@ func (c *Client) GetNFTTickersByNFTID(ctx context.Context, id string) (*NFTsIDTi
 // from(required): from date in UNIX Timestamp. Valid values: UNIX timestamp e.g. 1672531200.
 //
 // to(required): to date in UNIX Timestamp. Valid values: UNIX timestamp e.g. 1672531200.
-func (c *Client) GetVolumeChartRangeByExchangeID(ctx context.Context, id string, from, to int64) (*[]ExchangesIDVolumeChartResponse, error) {
+func (c *Client) GetVolumeChartRangeByExchangeID(ctx context.Context, id string, from, to int64) (*[]ExchangeVolumeChartResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("exchange id should not be empty")
 	}
@@ -348,7 +348,7 @@ func (c *Client) GetVolumeChartRangeByExchangeID(ctx context.Context, id string,
 		return nil, err
 	}
 
-	var data []ExchangesIDVolumeChartResponse
+	var data []ExchangeVolumeChartResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal exchanges id volume chart range response", "error", err)
 		return nil, err

@@ -74,8 +74,8 @@ const (
 	trendingPath = "/search/trending"
 
 	// global
-	globalPath = "/global"
-	globalDefi = "/global/decentralized_finance_defi"
+	globalPath     = "/global"
+	globalDefiPath = "/global/decentralized_finance_defi"
 
 	// companies
 	companiesPath = "/companies/public_treasury/%s"
