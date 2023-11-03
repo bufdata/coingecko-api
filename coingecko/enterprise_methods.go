@@ -31,7 +31,7 @@ import (
 //
 // interval(optional): data interval. Valid values: daily. if interval is not specified, auto data granularity will apply.
 func (c *Client) GetCirculatingSupplyChartByCoinID(ctx context.Context, id string, days uint, interval string) (
-	*CoinsIDCirculatingSupplyChartResponse, error) {
+	*CoinCirculatingSupplyChartResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("coin id should not be empty")
 	}
@@ -50,7 +50,7 @@ func (c *Client) GetCirculatingSupplyChartByCoinID(ctx context.Context, id strin
 		return nil, err
 	}
 
-	var data CoinsIDCirculatingSupplyChartResponse
+	var data CoinCirculatingSupplyChartResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins id circulating supply chart response", "error", err)
 		return nil, err
@@ -80,7 +80,7 @@ func (c *Client) GetCirculatingSupplyChartByCoinID(ctx context.Context, id strin
 //
 // to(required): to date in UNIX Timestamp. Valid values: UNIX timestamp, e.g. 1635724799.
 func (c *Client) GetCirculatingSupplyChartRangeByCoinID(ctx context.Context, id string, from, to int64) (
-	*CoinsIDCirculatingSupplyChartResponse, error) {
+	*CoinCirculatingSupplyChartResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("coin id should not be empty")
 	}
@@ -97,7 +97,7 @@ func (c *Client) GetCirculatingSupplyChartRangeByCoinID(ctx context.Context, id 
 		return nil, err
 	}
 
-	var data CoinsIDCirculatingSupplyChartResponse
+	var data CoinCirculatingSupplyChartResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins id circulating supply chart range response", "error", err)
 		return nil, err
@@ -116,7 +116,7 @@ func (c *Client) GetCirculatingSupplyChartRangeByCoinID(ctx context.Context, id 
 //
 // asset_platform_id(required): this is path to pass the asset platform id, not query parameter. Valid values: any
 // asset platform id, e.g. polygon-pos, arbitrum-nova, ethereum ...
-func (c *Client) ListAllTokensByAssetPlatformID(ctx context.Context, assetPlatformID string) (*TokensListAllResponse, error) {
+func (c *Client) ListAllTokensByAssetPlatformID(ctx context.Context, assetPlatformID string) (*ListAllTokensResponse, error) {
 	if assetPlatformID == "" {
 		return nil, fmt.Errorf("asset_platform_id should not be empty")
 	}
@@ -129,7 +129,7 @@ func (c *Client) ListAllTokensByAssetPlatformID(ctx context.Context, assetPlatfo
 		return nil, err
 	}
 
-	var data TokensListAllResponse
+	var data ListAllTokensResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal tokens list all response", "error", err)
 		return nil, err

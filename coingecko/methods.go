@@ -66,7 +66,6 @@ func (c *Client) SimplePrice(ctx context.Context, ids, vsCurrencies []string, in
 	params := url.Values{}
 	params.Add("ids", idsParams)
 	params.Add("vs_currencies", vsCurrenciesParams)
-	// TODO: the following items should be optimized, SimpleTokenPrice, too.
 	if includeMarketCap != "" {
 		params.Add("include_market_cap", includeMarketCap)
 	}
@@ -207,7 +206,7 @@ func (c *Client) SimpleSupportedVSCurrencies(ctx context.Context) (*SimpleSuppor
 //
 // include_platform(optional): flag to include platform contract addresses (eg. 0x.... for Ethereum based tokens).
 // valid values: true, false.
-func (c *Client) ListCoinsInfo(ctx context.Context, includePlatform bool) (*[]CoinsListResponse, error) {
+func (c *Client) ListCoinsInfo(ctx context.Context, includePlatform bool) (*[]ListCoinsInfoResponse, error) {
 	params := url.Values{}
 	params.Add("include_platform", strconv.FormatBool(includePlatform))
 	endpoint := fmt.Sprintf("%s%s?%s", c.apiURL, coinsListPath, params.Encode())
@@ -217,9 +216,9 @@ func (c *Client) ListCoinsInfo(ctx context.Context, includePlatform bool) (*[]Co
 		return nil, err
 	}
 
-	var data []CoinsListResponse
+	var data []ListCoinsInfoResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal coins list response", "error", err)
+		slog.Error("failed to unmarshal list coins info response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -259,7 +258,7 @@ func (c *Client) ListCoinsInfo(ctx context.Context, includePlatform bool) (*[]Co
 //
 // precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
 func (c *Client) ListCoinsMarketsData(ctx context.Context, vsCurrency string, ids []string, category, order string, perPage, page uint,
-	sparkline bool, priceChangePercentage []string, locale, precision string) (*[]CoinsMarketsResponse, error) {
+	sparkline bool, priceChangePercentage []string, locale, precision string) (*[]ListCoinsMarketsDataResponse, error) {
 	if vsCurrency == "" {
 		return nil, fmt.Errorf("vs currencies should not be empty")
 	}
@@ -305,15 +304,15 @@ func (c *Client) ListCoinsMarketsData(ctx context.Context, vsCurrency string, id
 		return nil, err
 	}
 
-	var data []CoinsMarketsResponse
+	var data []ListCoinsMarketsDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal simple token price response", "error", err)
+		slog.Error("failed to unmarshal list coins market data response", "error", err)
 		return nil, err
 	}
 	return &data, nil
 }
 
-// GetCoinDataByCoinID gets current data(name, price, market, including exchange tickers) for a coins.
+// GetCoinDataByCoinID gets current data(name, price, market, including exchange tickers) for a coin.
 //
 // IMPORTANT:
 // Ticker <object> is limited to 100 items, to get more tickers, use /coins/{id}/tickers.
@@ -350,7 +349,7 @@ func (c *Client) ListCoinsMarketsData(ctx context.Context, vsCurrency string, id
 //
 // sparkline(optional): include sparkline 7 days data (eg. true, false) [default: false].
 func (c *Client) GetCoinDataByCoinID(ctx context.Context, id string, localization, tickers, marketData, communityData,
-	developerData, sparkline bool) (*CoinsIDResponse, error) {
+	developerData, sparkline bool) (*CoinDataResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("coin id should not be empty")
 	}
@@ -371,7 +370,7 @@ func (c *Client) GetCoinDataByCoinID(ctx context.Context, id string, localizatio
 		return nil, err
 	}
 
-	var data CoinsIDResponse
+	var data CoinDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins id response", "error", err)
 		return nil, err
@@ -412,7 +411,7 @@ func (c *Client) GetCoinDataByCoinID(ctx context.Context, id string, localizatio
 // depth(optional): flag to show 2% orderbook depth. i.e., cost_to_move_up_usd and cost_to_move_down_usd. valid
 // values: true, false.
 func (c *Client) GetCoinTickersByCoinID(ctx context.Context, id, exchangeIDs string, includeExchangeLogo bool, page uint,
-	order string, depth bool) (*CoinsIDTickersResponse, int, error) {
+	order string, depth bool) (*CoinTickersResponse, int, error) {
 	if id == "" {
 		return nil, -1, fmt.Errorf("coin id should not be empty")
 	}
@@ -446,7 +445,7 @@ func (c *Client) GetCoinTickersByCoinID(ctx context.Context, id, exchangeIDs str
 	}
 	pageCount := calculateTotalPages(totalInt, 100)
 
-	var data CoinsIDTickersResponse
+	var data CoinTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins tickers response", "error", err)
 		return nil, -1, err
@@ -468,7 +467,7 @@ func (c *Client) GetCoinTickersByCoinID(ctx context.Context, id, exchangeIDs str
 // date(required): the date of data snapshot in dd-mm-yyyy eg. 30-12-2022.
 //
 // localization(optional): set false to exclude localized languages in response.
-func (c *Client) GetCoinHistoryDataByCoinID(ctx context.Context, id, date string, localization bool) (*CoinsIDHistoryResponse, error) {
+func (c *Client) GetCoinHistoryDataByCoinID(ctx context.Context, id, date string, localization bool) (*CoinHistoryDataResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("coin id should not be empty")
 	}
@@ -488,7 +487,7 @@ func (c *Client) GetCoinHistoryDataByCoinID(ctx context.Context, id, date string
 		return nil, err
 	}
 
-	var data CoinsIDHistoryResponse
+	var data CoinHistoryDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins history response", "error", err)
 		return nil, err
@@ -521,7 +520,7 @@ func (c *Client) GetCoinHistoryDataByCoinID(ctx context.Context, id, date string
 //
 // precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
 func (c *Client) GetCoinMarketChartByCoinID(ctx context.Context, id, vsCurrency, days, interval, precision string) (
-	*CoinsIDMarketChartResponse, error) {
+	*CoinMarketChartDataResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("coin id should not be empty")
 	}
@@ -550,7 +549,7 @@ func (c *Client) GetCoinMarketChartByCoinID(ctx context.Context, id, vsCurrency,
 		return nil, err
 	}
 
-	var data CoinsIDMarketChartResponse
+	var data CoinMarketChartDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins market chart response", "error", err)
 		return nil, err
@@ -583,7 +582,7 @@ func (c *Client) GetCoinMarketChartByCoinID(ctx context.Context, id, vsCurrency,
 //
 // precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
 func (c *Client) GetCoinMarketChartRangeByCoinID(ctx context.Context, id, vsCurrency, from, to, precision string) (
-	*CoinsIDMarketChartResponse, error) {
+	*CoinMarketChartDataResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("coin id should not be empty")
 	}
@@ -613,7 +612,7 @@ func (c *Client) GetCoinMarketChartRangeByCoinID(ctx context.Context, id, vsCurr
 		return nil, err
 	}
 
-	var data CoinsIDMarketChartResponse
+	var data CoinMarketChartDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins market chart range response", "error", err)
 		return nil, err
@@ -644,7 +643,7 @@ func (c *Client) GetCoinMarketChartRangeByCoinID(ctx context.Context, id, vsCurr
 // days(required): data up to number of days ago (1/7/14/30/90/180/365/max).
 //
 // precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
-func (c *Client) GetCoinOHLCByCoinID(ctx context.Context, id, vsCurrency, days, precision string) (*[]CoinsOHLCResponse, error) {
+func (c *Client) GetCoinOHLCByCoinID(ctx context.Context, id, vsCurrency, days, precision string) (*[]CoinOHLCResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("coin id should not be empty")
 	}
@@ -670,7 +669,7 @@ func (c *Client) GetCoinOHLCByCoinID(ctx context.Context, id, vsCurrency, days, 
 		return nil, err
 	}
 
-	var data []CoinsOHLCResponse
+	var data []CoinOHLCResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins ohlc response", "error", err)
 		return nil, err
@@ -687,7 +686,7 @@ func (c *Client) GetCoinOHLCByCoinID(ctx context.Context, id, vsCurrency, days, 
 // id(required): asset platform (See asset_platforms endpoint for list of options).
 //
 // contract_address(required): token's contract address.
-func (c *Client) GetCoinInfoByContractAddress(ctx context.Context, id, contractAddress string) (*CoinsContractResponse, error) {
+func (c *Client) GetCoinInfoByContractAddress(ctx context.Context, id, contractAddress string) (*CoinDataResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("id should not be empty")
 	}
@@ -703,7 +702,7 @@ func (c *Client) GetCoinInfoByContractAddress(ctx context.Context, id, contractA
 		return nil, err
 	}
 
-	var data CoinsContractResponse
+	var data CoinDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins contract response", "error", err)
 		return nil, err
@@ -735,7 +734,7 @@ func (c *Client) GetCoinInfoByContractAddress(ctx context.Context, id, contractA
 //
 // precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
 func (c *Client) GetMarketChartByContractAddress(ctx context.Context, id, contractAddress, vsCurrency, days, precision string) (
-	*CoinsContractMarketChartResponse, error) {
+	*CoinMarketChartDataResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("asset_platform id should not be empty")
 	}
@@ -764,7 +763,7 @@ func (c *Client) GetMarketChartByContractAddress(ctx context.Context, id, contra
 		return nil, err
 	}
 
-	var data CoinsContractMarketChartResponse
+	var data CoinMarketChartDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins contract market chart response", "error", err)
 		return nil, err
@@ -798,7 +797,7 @@ func (c *Client) GetMarketChartByContractAddress(ctx context.Context, id, contra
 //
 // precision(optional): full or any value between 0-18 to specify decimal place for currency price value.
 func (c *Client) GetMarketChartRangeByContractAddress(ctx context.Context, id, contractAddress, vsCurrency, from, to,
-	precision string) (*CoinsContractMarketChartResponse, error) {
+	precision string) (*CoinMarketChartDataResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("asset_platform id should not be empty")
 	}
@@ -831,7 +830,7 @@ func (c *Client) GetMarketChartRangeByContractAddress(ctx context.Context, id, c
 		return nil, err
 	}
 
-	var data CoinsContractMarketChartResponse
+	var data CoinMarketChartDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins contract market chart range response", "error", err)
 		return nil, err
@@ -874,7 +873,7 @@ func (c *Client) ListAllAssetPlatforms(ctx context.Context, filter string) (*[]A
 // ListAllCategories lists all categories.
 //
 // Cache/Update Frequency: every 5 minutes.
-func (c *Client) ListAllCategories(ctx context.Context) (*[]CoinsCategoriesListResponse, error) {
+func (c *Client) ListAllCategories(ctx context.Context) (*[]ListAllCategoriesResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, coinsCategoriesListPath)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
@@ -882,7 +881,7 @@ func (c *Client) ListAllCategories(ctx context.Context) (*[]CoinsCategoriesListR
 		return nil, err
 	}
 
-	var data []CoinsCategoriesListResponse
+	var data []ListAllCategoriesResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins categories list response", "error", err)
 		return nil, err
@@ -898,7 +897,7 @@ func (c *Client) ListAllCategories(ctx context.Context) (*[]CoinsCategoriesListR
 //
 // order(optional): valid values: market_cap_desc(default), market_cap_asc, name_desc, name_asc,
 // market_cap_change_24h_desc, market_cap_change_24h_asc.
-func (c *Client) ListAllCategoriesWithMarketData(ctx context.Context, order string) (*[]CoinsCategoriesResponse, error) {
+func (c *Client) ListAllCategoriesWithMarketData(ctx context.Context, order string) (*[]ListAllCategoriesWithMarketDataResponse, error) {
 	params := url.Values{}
 	if order == "" {
 		params.Add("order", "market_cap_desc")
@@ -911,7 +910,7 @@ func (c *Client) ListAllCategoriesWithMarketData(ctx context.Context, order stri
 		return nil, err
 	}
 
-	var data []CoinsCategoriesResponse
+	var data []ListAllCategoriesWithMarketDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal coins categories response", "error", err)
 		return nil, err
@@ -967,7 +966,7 @@ func (c *Client) ListAllExchanges(ctx context.Context, perPage, page uint) (*[]E
 // Use this to obtain all the markets' id in order to make API calls.
 //
 // Cache/Update Frequency: every 5 minutes.
-func (c *Client) ListAllMarketsInfo(ctx context.Context) (*[]ExchangesListResponse, error) {
+func (c *Client) ListAllMarketsInfo(ctx context.Context) (*[]ExchangeMarketsInfoResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, exchangesListPath)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
@@ -975,7 +974,7 @@ func (c *Client) ListAllMarketsInfo(ctx context.Context) (*[]ExchangesListRespon
 		return nil, err
 	}
 
-	var data []ExchangesListResponse
+	var data []ExchangeMarketsInfoResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal exchanges list response", "error", err)
 		return nil, err
@@ -1006,7 +1005,7 @@ func (c *Client) ListAllMarketsInfo(ctx context.Context) (*[]ExchangesListRespon
 // Path parameters:
 //
 // id(required): pass the exchange id(can be obtained from /exchanges/list) eg. binance.
-func (c *Client) GetExchangeVolumeAndTickersByExchangeID(ctx context.Context, id string) (*ExchangesIDResponse, error) {
+func (c *Client) GetExchangeVolumeAndTickersByExchangeID(ctx context.Context, id string) (*ExchangeVolumeAndTickersResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("exchange id should not be empty")
 	}
@@ -1019,7 +1018,7 @@ func (c *Client) GetExchangeVolumeAndTickersByExchangeID(ctx context.Context, id
 		return nil, err
 	}
 
-	var data ExchangesIDResponse
+	var data ExchangeVolumeAndTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal exchanges id response", "error", err)
 		return nil, err
@@ -1063,7 +1062,7 @@ func (c *Client) GetExchangeVolumeAndTickersByExchangeID(ctx context.Context, id
 //
 // order(optional): valid values: trust_score_desc (default), trust_score_asc and volume_desc.
 func (c *Client) GetExchangeTickersByExchangeID(ctx context.Context, id, coinIDs string, includeExchangeLogo bool, page uint, depth bool,
-	order string) (*ExchangesIDTickersResponse, int, error) {
+	order string) (*ExchangeTickersResponse, int, error) {
 	if id == "" {
 		return nil, -1, fmt.Errorf("exchange id should not be empty")
 	}
@@ -1099,7 +1098,7 @@ func (c *Client) GetExchangeTickersByExchangeID(ctx context.Context, id, coinIDs
 	}
 	pageCount := calculateTotalPages(totalInt, 100)
 
-	var data ExchangesIDTickersResponse
+	var data ExchangeTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal exchanges id tickers response", "error", err)
 		return nil, -1, err
@@ -1122,7 +1121,7 @@ func (c *Client) GetExchangeTickersByExchangeID(ctx context.Context, id, coinIDs
 // Query parameters:
 //
 // days(required): data up to number of days ago (1/7/14/30/90/180/365).
-func (c *Client) GetExchangeVolumeChartByExchangeID(ctx context.Context, id string, days uint) (*[]ExchangesIDVolumeChartResponse, error) {
+func (c *Client) GetExchangeVolumeChartByExchangeID(ctx context.Context, id string, days uint) (*[]ExchangeVolumeChartResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("exchange id should not be empty")
 	}
@@ -1138,7 +1137,7 @@ func (c *Client) GetExchangeVolumeChartByExchangeID(ctx context.Context, id stri
 		return nil, err
 	}
 
-	var data []ExchangesIDVolumeChartResponse
+	var data []ExchangeVolumeChartResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal exchanges id volume chart response", "error", err)
 		return nil, err
@@ -1156,7 +1155,7 @@ func (c *Client) GetExchangeVolumeChartByExchangeID(ctx context.Context, id stri
 //
 // include_tickers(optional): ['all', 'unexpired'] - expired to show unexpired tickers, all to list all tickers;
 // defaults to unexpired.
-func (c *Client) ListAllDerivativesTickers(ctx context.Context, includeTickers string) (*[]DerivativesResponse, error) {
+func (c *Client) ListAllDerivativesTickers(ctx context.Context, includeTickers string) (*[]DerivativesTickersResponse, error) {
 	params := url.Values{}
 	if includeTickers == "" {
 		params.Add("include_tickers", "unexpired")
@@ -1171,7 +1170,7 @@ func (c *Client) ListAllDerivativesTickers(ctx context.Context, includeTickers s
 		return nil, err
 	}
 
-	var data []DerivativesResponse
+	var data []DerivativesTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal derivatives response", "error", err)
 		return nil, err
@@ -1250,7 +1249,7 @@ func (c *Client) ListAllDerivativesExchanges(ctx context.Context, order string, 
 //
 // include_tickers(optional): ['all', 'unexpired'] - expired to show unexpired tickers, all to list all tickers,
 // leave blank to omit tickers data in response.
-func (c *Client) ListDerivativesExchangeData(ctx context.Context, id, includeTickers string) (*DerivativesExchangesIDResponse, error) {
+func (c *Client) ListDerivativesExchangeData(ctx context.Context, id, includeTickers string) (*DerivativesExchangeTickersResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("exchange id should not be empty")
 	}
@@ -1273,7 +1272,7 @@ func (c *Client) ListDerivativesExchangeData(ctx context.Context, id, includeTic
 		return nil, err
 	}
 
-	var data DerivativesExchangesIDResponse
+	var data DerivativesExchangeTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal derivatives exchanges id response", "error", err)
 		return nil, err
@@ -1284,7 +1283,7 @@ func (c *Client) ListDerivativesExchangeData(ctx context.Context, id, includeTic
 // ListAllDerivativeExchangeInfo lists all derivative exchanges name and identifier.
 //
 // Cache/Update Frequency: every 5 minutes.
-func (c *Client) ListAllDerivativeExchangeInfo(ctx context.Context) (*[]DerivativesExchangesListResponse, error) {
+func (c *Client) ListAllDerivativeExchangeInfo(ctx context.Context) (*[]DerivativesExchangeInfoResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, derivativesListPath)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
@@ -1292,7 +1291,7 @@ func (c *Client) ListAllDerivativeExchangeInfo(ctx context.Context) (*[]Derivati
 		return nil, err
 	}
 
-	var data []DerivativesExchangesListResponse
+	var data []DerivativesExchangeInfoResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal derivatives exchanges list response", "error", err)
 		return nil, err
@@ -1316,7 +1315,7 @@ func (c *Client) ListAllDerivativeExchangeInfo(ctx context.Context) (*[]Derivati
 // per_page(optional): valid values: 1..250; total results per page; example: 100.
 //
 // page(optional): page through results; example: 1.
-func (c *Client) ListAllNFTInfo(ctx context.Context, order, assetPlatformID string, perPage, page uint) (*[]NFTsListResponse, int, error) {
+func (c *Client) ListAllNFTInfo(ctx context.Context, order, assetPlatformID string, perPage, page uint) (*[]NFTInfoResponse, int, error) {
 	params := url.Values{}
 	if order != "" {
 		params.Add("order", order)
@@ -1348,7 +1347,7 @@ func (c *Client) ListAllNFTInfo(ctx context.Context, order, assetPlatformID stri
 	}
 	pageCount := calculateTotalPages(totalInt, int(perPage))
 
-	var data []NFTsListResponse
+	var data []NFTInfoResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal nfts list response", "error", err)
 		return nil, -1, err
@@ -1364,7 +1363,7 @@ func (c *Client) ListAllNFTInfo(ctx context.Context, order, assetPlatformID stri
 // Path parameters:
 //
 // id(required): id of nft collection (can be obtained from /nfts/list).
-func (c *Client) GetNFTDataByNFTID(ctx context.Context, id string) (*NFTsIDResponse, error) {
+func (c *Client) GetNFTDataByNFTID(ctx context.Context, id string) (*NFTDataResponse, error) {
 	if id == "" {
 		return nil, fmt.Errorf("nft id should not be empty")
 	}
@@ -1377,7 +1376,7 @@ func (c *Client) GetNFTDataByNFTID(ctx context.Context, id string) (*NFTsIDRespo
 		return nil, err
 	}
 
-	var data NFTsIDResponse
+	var data NFTDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal nfts id response", "error", err)
 		return nil, err
@@ -1397,7 +1396,7 @@ func (c *Client) GetNFTDataByNFTID(ctx context.Context, id string) (*NFTsIDRespo
 //
 // contract_address(required): the contract_address of the nft collection (/nfts/list for list of nft collection with metadata).
 func (c *Client) GetNFTDataByAssetPlatformIDAndContractAddress(ctx context.Context, assetPlatformID, contractAddress string) (
-	*NFTsIDResponse, error) {
+	*NFTDataResponse, error) {
 	if assetPlatformID == "" {
 		return nil, fmt.Errorf("asset_platform_id should not be empty")
 	}
@@ -1413,7 +1412,7 @@ func (c *Client) GetNFTDataByAssetPlatformIDAndContractAddress(ctx context.Conte
 		return nil, err
 	}
 
-	var data NFTsIDResponse
+	var data NFTDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal nfts contract response", "error", err)
 		return nil, err
@@ -1496,7 +1495,7 @@ func (c *Client) SearchTrending(ctx context.Context) (*SearchTrendingResponse, e
 // GetGlobalCryptocurrencyData gets cryptocurrency global data.
 //
 // Cache/Update Frequency: every 10 minutes.
-func (c *Client) GetGlobalCryptocurrencyData(ctx context.Context) (*GlobalResponse, error) {
+func (c *Client) GetGlobalCryptocurrencyData(ctx context.Context) (*GlobalCryptocurrencyResponse, error) {
 	endpoint := fmt.Sprintf("%s%s", c.apiURL, globalPath)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
@@ -1504,7 +1503,7 @@ func (c *Client) GetGlobalCryptocurrencyData(ctx context.Context) (*GlobalRespon
 		return nil, err
 	}
 
-	var data GlobalResponse
+	var data GlobalCryptocurrencyResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
 		slog.Error("failed to unmarshal global response", "error", err)
 		return nil, err
@@ -1516,7 +1515,7 @@ func (c *Client) GetGlobalCryptocurrencyData(ctx context.Context) (*GlobalRespon
 //
 // Cache/Update Frequency: every 60 minutes.
 func (c *Client) GetGlobalTop100DefiData(ctx context.Context) (*GlobalDefiResponse, error) {
-	endpoint := fmt.Sprintf("%s%s", c.apiURL, globalDefi)
+	endpoint := fmt.Sprintf("%s%s", c.apiURL, globalDefiPath)
 	resp, _, err := c.sendReq(ctx, endpoint)
 	if err != nil {
 		slog.Error("failed to send request to get global top 100 defi data api", "error", err)

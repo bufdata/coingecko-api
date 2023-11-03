@@ -13,22 +13,14 @@ type PingResponse struct {
 // SimpleSupportedVSCurrenciesResponse returned by SimpleSupportedVSCurrencies API.
 type SimpleSupportedVSCurrenciesResponse []string
 
-// CoinsListResponse returned by CoinsList API.
-type CoinsListResponse struct {
+// ListCoinsInfoResponse returned by ListCoinsInfo API.
+type ListCoinsInfoResponse struct {
 	coinsStruct
 	Platforms *PlatformsItem `json:"platforms,omitempty"`
 }
 
-// AssetPlatformsResponse returned by AssetPlatforms API.
-type AssetPlatformsResponse struct {
-	ID              string   `json:"id"`
-	ChainIdentifier *float64 `json:"chain_identifier"`
-	Name            string   `json:"name"`
-	Shortname       string   `json:"shortname"`
-}
-
-// CoinsMarketsResponse returned by CoinsMarkets API.
-type CoinsMarketsResponse struct {
+// ListCoinsMarketsDataResponse returned by ListCoinsMarketsData API.
+type ListCoinsMarketsDataResponse struct {
 	coinsStruct
 	Image                               string         `json:"image"`
 	CurrentPrice                        float64        `json:"current_price"`
@@ -63,8 +55,8 @@ type CoinsMarketsResponse struct {
 	PriceChangePercentage1yInCurrency   float64        `json:"price_change_percentage_1y_in_currency,omitempty"`
 }
 
-// CoinsIDResponse returned by CoinsID API.
-type CoinsIDResponse struct {
+// CoinDataResponse returned by GetCoinDataByCoinID API.
+type CoinDataResponse struct {
 	coinsStruct
 	AssetPlatformID              string                  `json:"asset_platform_id"`
 	Platforms                    *PlatformsItem          `json:"platforms"`
@@ -102,14 +94,14 @@ type CoinsIDResponse struct {
 	Tickers                      *[]TickersItem          `json:"tickers,omitempty"`
 }
 
-// CoinsIDTickersResponse returned by CoinsIDTickers API.
-type CoinsIDTickersResponse struct {
+// CoinTickersResponse returned by GetCoinTickersByCoinID API.
+type CoinTickersResponse struct {
 	Name    string        `json:"name"`
 	Tickers []TickersItem `json:"tickers"`
 }
 
-// CoinsIDHistoryResponse returned by CoinsIDHistory API.
-type CoinsIDHistoryResponse struct {
+// CoinHistoryDataResponse returned by GetCoinHistoryDataByCoinID API.
+type CoinHistoryDataResponse struct {
 	coinsStruct
 	Localization        LocalizationItem        `json:"localization,omitempty"`
 	Image               ImageItem               `json:"image"`
@@ -119,36 +111,34 @@ type CoinsIDHistoryResponse struct {
 	PublicInterestStats PublicInterestStatsItem `json:"public_interest_stats"`
 }
 
-// CoinsIDMarketChartResponse returned by CoinsIDMarketChart or CoinsIDMarketChartRange API.
-type CoinsIDMarketChartResponse struct {
+// CoinMarketChartDataResponse returned by GetCoinMarketChartByCoinID or GetCoinMarketChartRangeByCoinID API.
+type CoinMarketChartDataResponse struct {
 	Prices       []ChartItem `json:"prices"`
 	MarketCaps   []ChartItem `json:"market_caps"`
 	TotalVolumes []ChartItem `json:"total_volumes"`
 }
 
-// CoinsOHLCResponse returned by CoinsOHLC API.
+// AssetPlatformsResponse returned by AssetPlatforms API.
+type AssetPlatformsResponse struct {
+	ID              string   `json:"id"`
+	ChainIdentifier *float64 `json:"chain_identifier"`
+	Name            string   `json:"name"`
+	Shortname       string   `json:"shortname"`
+}
+
+// CoinOHLCResponse returned by GetCoinOHLCByCoinID API.
 // It consists of five elements: time in unix millisecond(int64), coins opening price(float64), high price(float64),
 // low price(float64) and closing price(float64).
-type CoinsOHLCResponse [5]float64
+type CoinOHLCResponse [5]float64
 
-// CoinsContractResponse returned by CoinsContract API.
-type CoinsContractResponse struct {
-	CoinsIDResponse
-}
-
-// CoinsContractMarketChartResponse returned by CoinsContractMarketChart and CoinsContractMarketChartRange API.
-type CoinsContractMarketChartResponse struct {
-	CoinsIDMarketChartResponse
-}
-
-// CoinsCategoriesListResponse returned by CoinsCategoriesList API.
-type CoinsCategoriesListResponse struct {
+// ListAllCategoriesResponse returned by ListAllCategories API.
+type ListAllCategoriesResponse struct {
 	CategoryID string `json:"category_id"`
 	Name       string `json:"name"`
 }
 
-// CoinsCategoriesResponse returned by CoinsCategories API.
-type CoinsCategoriesResponse struct {
+// ListAllCategoriesWithMarketDataResponse returned by ListAllCategoriesWithMarketData API.
+type ListAllCategoriesWithMarketDataResponse struct {
 	ID                 string     `json:"id"`
 	Name               string     `json:"name"`
 	MarketCap          *float64   `json:"market_cap"`
@@ -159,20 +149,20 @@ type CoinsCategoriesResponse struct {
 	UpdatedAt          *time.Time `json:"updated_at"`
 }
 
-// ExchangesResponse returned by Exchanges API.
+// ExchangesResponse returned by ListAllExchanges API.
 type ExchangesResponse struct {
 	ID string `json:"id"`
 	ExchangesItem
 }
 
-// ExchangesListResponse returned by ExchangesList API.
-type ExchangesListResponse struct {
+// ExchangeMarketsInfoResponse returned by ListAllMarketsInfo API.
+type ExchangeMarketsInfoResponse struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
-// ExchangesIDResponse returned by ExchangesID API.
-type ExchangesIDResponse struct {
+// ExchangeVolumeAndTickersResponse returned by GetExchangeVolumeAndTickersByExchangeID API.
+type ExchangeVolumeAndTickersResponse struct {
 	ExchangesItem
 	FacebookURL   string              `json:"facebook_url"`
 	RedditURL     string              `json:"reddit_url"`
@@ -188,18 +178,18 @@ type ExchangesIDResponse struct {
 	StatusUpdates []StatusUpdatesItem `json:"status_updates"`
 }
 
-// ExchangesIDTickersResponse returned by ExchangesIDTickers API.
-type ExchangesIDTickersResponse struct {
+// ExchangeTickersResponse returned by GetExchangeTickersByExchangeID API.
+type ExchangeTickersResponse struct {
 	Name    string
 	Tickers []TickersItem `json:"tickers"`
 }
 
-// ExchangesIDVolumeChartResponse returned by ExchangesIDVolumeChart API.
+// ExchangeVolumeChartResponse returned by GetExchangeVolumeChartByExchangeID or GetVolumeChartRangeByExchangeID API.
 // It consists of two elements: one is time represents unix millisecond(int64); another is volume chart, type is string.
-type ExchangesIDVolumeChartResponse [2]json.Number
+type ExchangeVolumeChartResponse [2]json.Number
 
-// DerivativesResponse returned by Derivatives API.
-type DerivativesResponse struct {
+// DerivativesTickersResponse returned by ListAllDerivativesTickers API.
+type DerivativesTickersResponse struct {
 	Market                   string  `json:"market"`
 	Symbol                   string  `json:"symbol"`
 	IndexID                  string  `json:"index_id"`
@@ -216,7 +206,7 @@ type DerivativesResponse struct {
 	ExpiredAt                *int64  `json:"expired_at"`
 }
 
-// DerivativesExchangesResponse returned by DerivativesExchanges API.
+// DerivativesExchangesResponse returned by ListAllDerivativesExchanges API.
 type DerivativesExchangesResponse struct {
 	Name                   string  `json:"name"`
 	ID                     string  `json:"id,omitempty"`
@@ -231,80 +221,20 @@ type DerivativesExchangesResponse struct {
 	URL                    string  `json:"url"`
 }
 
-// DerivativesExchangesIDResponse returned by DerivativesExchangesID API.
-type DerivativesExchangesIDResponse struct {
+// DerivativesExchangeTickersResponse returned by ListDerivativesExchangeData API.
+type DerivativesExchangeTickersResponse struct {
 	DerivativesExchangesResponse
 	Tickers []DerivativesExchangesTickersItem `json:"tickers,omitempty"`
 }
 
-// DerivativesExchangesListResponse returned by DerivativesExchangesList API.
-type DerivativesExchangesListResponse struct {
+// DerivativesExchangeInfoResponse returned by ListAllDerivativeExchangeInfo API.
+type DerivativesExchangeInfoResponse struct {
 	Name string `json:"name"`
 	ID   string `json:"id"`
 }
 
-// CompaniesPublicTreasuryResponse returned by CompaniesPublicTreasury API.
-type CompaniesPublicTreasuryResponse struct {
-	TotalHoldings      float64         `json:"total_holdings"`
-	TotalValueUSD      float64         `json:"total_value_usd"`
-	MarketCapDominance float64         `json:"market_cap_dominance"`
-	Companies          []CompaniesItem `json:"companies"`
-}
-
-// GlobalDefiResponse returned by GlobalDefi API.
-type GlobalDefiResponse struct {
-	Data struct {
-		DefiMarketCap        string  `json:"defi_market_cap"`
-		EthMarketCap         string  `json:"eth_market_cap"`
-		DefiToEthRatio       string  `json:"defi_to_eth_ratio"`
-		TradingVolume24h     string  `json:"trading_volume_24h"`
-		DefiDominance        string  `json:"defi_dominance"`
-		TopCoinName          string  `json:"top_coin_name"`
-		TopCoinDefiDominance float64 `json:"top_coin_defi_dominance"`
-	} `json:"data"`
-}
-
-// GlobalResponse returned by Global API.
-type GlobalResponse struct {
-	Data struct {
-		ActiveCryptoCurrencies          int                `json:"active_crypto_currencies"`
-		UpcomingICOs                    int                `json:"upcoming_icos"`
-		OngoingICOs                     int                `json:"ongoing_icos"`
-		EndedICOs                       int                `json:"ended_icos"`
-		Markets                         int                `json:"markets"`
-		TotalMarketCap                  map[string]float64 `json:"total_market_cap"`
-		TotalVolume                     map[string]float64 `json:"total_volume"`
-		MarketCapPercentage             map[string]float64 `json:"market_cap_percentage"`
-		MarketCapChangePercentage24hUSD float64            `json:"market_cap_change_percentage_24h_usd"`
-		UpdatedAt                       int64              `json:"updated_at"`
-	} `json:"data"`
-}
-
-// SearchTrendingResponse returned by SearchTrending API.
-type SearchTrendingResponse struct {
-	Coins []struct {
-		SearchTrendingCoinItem `json:"item"`
-	} `json:"coins"`
-	NFTs      []struct{ SearchTrendingNFTItem }
-	Exchanges []any `json:"exchanges"`
-}
-
-// SearchResponse returned by Search API.
-type SearchResponse struct {
-	Coins      []SearchCoinsItem      `json:"coins"`
-	Exchanges  []SearchExchangesItem  `json:"exchanges"`
-	ICOs       []any                  `json:"icos"`
-	Categories []SearchCategoriesItem `json:"categories"`
-	NFTs       []SearchNFTsItem       `json:"nfts"`
-}
-
-// ExchangeRatesResponse returned by ExchangeRates API.
-type ExchangeRatesResponse struct {
-	Rates map[string]ExchangeRatesItem `json:"rates"`
-}
-
-// NFTsListResponse returned by NFTsList API.
-type NFTsListResponse struct {
+// NFTInfoResponse returned by ListAllNFTInfo API.
+type NFTInfoResponse struct {
 	ID              string `json:"id"`
 	ContractAddress string `json:"contract_address"`
 	Name            string `json:"name"`
@@ -312,11 +242,11 @@ type NFTsListResponse struct {
 	Symbol          string `json:"symbol"`
 }
 
-// NFTsIDResponse returned by NFTsID or NFTsContract API.
+// NFTDataResponse returned by NFTsID or GetNFTDataByNFTID API.
 // TODO: FloorPrice24hPercentageChange, MarketCap24hPercentageChange, Volume24hPercentageChange,FloorPrice7dPercentageChange,
 // FloorPrice14dPercentageChange,FloorPrice30dPercentageChange,FloorPrice1yPercentageChange type is NativeCurrencyUSDItem;
 // but in golang cannot unmarshal them into {} when they are empty.
-type NFTsIDResponse struct {
+type NFTDataResponse struct {
 	ID              string `json:"id"`
 	ContractAddress string `json:"contract_address"`
 	AssetPlatformID string `json:"asset_platform_id"`
@@ -356,19 +286,79 @@ type NFTsIDResponse struct {
 	Explorers                     []ExplorerItem  `json:"explorers"`
 }
 
-// CoinsListNewResponse returned by CoinsListNew API.
-type CoinsListNewResponse struct {
+// ExchangeRatesResponse returned by GetExchangeRates API.
+type ExchangeRatesResponse struct {
+	Rates map[string]ExchangeRatesItem `json:"rates"`
+}
+
+// SearchResponse returned by Search API.
+type SearchResponse struct {
+	Coins      []SearchCoinsItem      `json:"coins"`
+	Exchanges  []SearchExchangesItem  `json:"exchanges"`
+	ICOs       []any                  `json:"icos"`
+	Categories []SearchCategoriesItem `json:"categories"`
+	NFTs       []SearchNFTsItem       `json:"nfts"`
+}
+
+// SearchTrendingResponse returned by SearchTrending API.
+type SearchTrendingResponse struct {
+	Coins []struct {
+		SearchTrendingCoinItem `json:"item"`
+	} `json:"coins"`
+	NFTs      []struct{ SearchTrendingNFTItem }
+	Exchanges []any `json:"exchanges"`
+}
+
+// GlobalCryptocurrencyResponse returned by GetGlobalCryptocurrencyData API.
+type GlobalCryptocurrencyResponse struct {
+	Data struct {
+		ActiveCryptoCurrencies          int                `json:"active_crypto_currencies"`
+		UpcomingICOs                    int                `json:"upcoming_icos"`
+		OngoingICOs                     int                `json:"ongoing_icos"`
+		EndedICOs                       int                `json:"ended_icos"`
+		Markets                         int                `json:"markets"`
+		TotalMarketCap                  map[string]float64 `json:"total_market_cap"`
+		TotalVolume                     map[string]float64 `json:"total_volume"`
+		MarketCapPercentage             map[string]float64 `json:"market_cap_percentage"`
+		MarketCapChangePercentage24hUSD float64            `json:"market_cap_change_percentage_24h_usd"`
+		UpdatedAt                       int64              `json:"updated_at"`
+	} `json:"data"`
+}
+
+// GlobalDefiResponse returned by GlobalDefi API.
+type GlobalDefiResponse struct {
+	Data struct {
+		DefiMarketCap        string  `json:"defi_market_cap"`
+		EthMarketCap         string  `json:"eth_market_cap"`
+		DefiToEthRatio       string  `json:"defi_to_eth_ratio"`
+		TradingVolume24h     string  `json:"trading_volume_24h"`
+		DefiDominance        string  `json:"defi_dominance"`
+		TopCoinName          string  `json:"top_coin_name"`
+		TopCoinDefiDominance float64 `json:"top_coin_defi_dominance"`
+	} `json:"data"`
+}
+
+// CompaniesPublicTreasuryResponse returned by CompaniesPublicTreasury API.
+type CompaniesPublicTreasuryResponse struct {
+	TotalHoldings      float64         `json:"total_holdings"`
+	TotalValueUSD      float64         `json:"total_value_usd"`
+	MarketCapDominance float64         `json:"market_cap_dominance"`
+	Companies          []CompaniesItem `json:"companies"`
+}
+
+// ListLatest200CoinsResponse returned by ListLatest200Coins API.
+type ListLatest200CoinsResponse struct {
 	coinsStruct
 	ActivatedAt int64 `json:"activated_at"`
 }
 
-// CoinsTopGainersLosersResponse returned by CoinsTopGainersLosers API.
+// CoinsTopGainersLosersResponse returned by GetTopGainersLosers API.
 type CoinsTopGainersLosersResponse struct {
 	TopGainers []struct{ TopGainerLosersItem } `json:"top_gainers"`
 	TopLosers  []struct{ TopGainerLosersItem } `json:"top_losers"`
 }
 
-// GlobalMarketCapChartResponse returned by GlobalMarketCapChart API.
+// GlobalMarketCapChartResponse returned by GetGlobalMarketCapChartData API.
 type GlobalMarketCapChartResponse struct {
 	MarketCapChart struct {
 		MarketCap []ChartItem `json:"market_cap"`
@@ -376,7 +366,7 @@ type GlobalMarketCapChartResponse struct {
 	} `json:"market_cap_chart"`
 }
 
-// NFTsMarketsResponse returned by NFTsMarkets API.
+// NFTsMarketsResponse returned by ListAllNFTsMarketsData API.
 type NFTsMarketsResponse struct {
 	ID              string `json:"id"`
 	ContractAddress string `json:"contract_address"`
@@ -396,7 +386,7 @@ type NFTsMarketsResponse struct {
 	TotalSupply                                float64               `json:"total_supply"`
 }
 
-// NFTsIDMarketChartResponse returned by NFTsIDMarketChart or NFTsContractMarketChart API.
+// NFTsIDMarketChartResponse returned by GetMarketChartByNFTID or GetMarketChartByNFTContractAddress API.
 type NFTsIDMarketChartResponse struct {
 	FloorPriceUSD    []ChartItem `json:"floor_price_usd"`
 	FloorPriceNative []ChartItem `json:"floor_price_native"`
@@ -406,20 +396,20 @@ type NFTsIDMarketChartResponse struct {
 	MarketCapNative  []ChartItem `json:"market_cap_native"`
 }
 
-// NFTsIDTickersResponse returned by NFTsIDTickers API.
-type NFTsIDTickersResponse struct {
+// NFTTickersResponse returned by GetNFTTickersByNFTID API.
+type NFTTickersResponse struct {
 	Tickers []struct{ NFTsIDTickersItem } `json:"tickers"`
 }
 
-// CoinsIDCirculatingSupplyChartResponse returned by CoinsIDCirculatingSupplyChart API.
-type CoinsIDCirculatingSupplyChartResponse struct {
+// CoinCirculatingSupplyChartResponse returned by GetCirculatingSupplyChartByCoinID API.
+type CoinCirculatingSupplyChartResponse struct {
 	CirculatingSupply []struct {
 		CoinsIDCirculatingSupplyChartItem
 	} `json:"circulating_supply"`
 }
 
-// TokensListAllResponse returned by TokensListAll API.
-type TokensListAllResponse struct {
+// ListAllTokensResponse returned by ListAllTokensByAssetPlatformID API.
+type ListAllTokensResponse struct {
 	Name      string              `json:"name"`
 	LogoURI   string              `json:"logoURI"`
 	Keywords  []string            `json:"keywords"`
