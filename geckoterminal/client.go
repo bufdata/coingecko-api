@@ -32,7 +32,7 @@ func (c *Client) sendReq(ctx context.Context, endpoint string) ([]byte, http.Hea
 		return nil, nil, err
 	}
 
-	data, header, err := c.doAPI(ctx, req)
+	data, header, err := c.doAPI(req)
 	if err != nil {
 		slog.Error("failed to do api", "url", req.URL.String(), "header", req.Header, "error", err)
 		return nil, nil, err
@@ -40,7 +40,7 @@ func (c *Client) sendReq(ctx context.Context, endpoint string) ([]byte, http.Hea
 	return data, header, nil
 }
 
-func (c *Client) doAPI(ctx context.Context, req *http.Request) ([]byte, http.Header, error) {
+func (c *Client) doAPI(req *http.Request) ([]byte, http.Header, error) {
 	req.Header.Add(acceptHeader, jsonHeader)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {

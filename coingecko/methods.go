@@ -372,7 +372,7 @@ func (c *Client) GetCoinDataByCoinID(ctx context.Context, id string, localizatio
 
 	var data CoinDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal coins id response", "error", err)
+		slog.Error("failed to unmarshal coin data response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -447,7 +447,7 @@ func (c *Client) GetCoinTickersByCoinID(ctx context.Context, id, exchangeIDs str
 
 	var data CoinTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal coins tickers response", "error", err)
+		slog.Error("failed to unmarshal coin tickers response", "error", err)
 		return nil, -1, err
 	}
 	return &data, pageCount, nil
@@ -489,7 +489,7 @@ func (c *Client) GetCoinHistoryDataByCoinID(ctx context.Context, id, date string
 
 	var data CoinHistoryDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal coins history response", "error", err)
+		slog.Error("failed to unmarshal coin history data response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -551,7 +551,7 @@ func (c *Client) GetCoinMarketChartByCoinID(ctx context.Context, id, vsCurrency,
 
 	var data CoinMarketChartDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal coins market chart response", "error", err)
+		slog.Error("failed to unmarshal coin market chart data response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -614,7 +614,7 @@ func (c *Client) GetCoinMarketChartRangeByCoinID(ctx context.Context, id, vsCurr
 
 	var data CoinMarketChartDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal coins market chart range response", "error", err)
+		slog.Error("failed to unmarshal coin market chart data response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -671,7 +671,7 @@ func (c *Client) GetCoinOHLCByCoinID(ctx context.Context, id, vsCurrency, days, 
 
 	var data []CoinOHLCResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal coins ohlc response", "error", err)
+		slog.Error("failed to unmarshal coin ohlc response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -704,7 +704,7 @@ func (c *Client) GetCoinInfoByContractAddress(ctx context.Context, id, contractA
 
 	var data CoinDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal coins contract response", "error", err)
+		slog.Error("failed to unmarshal coin data response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -765,7 +765,7 @@ func (c *Client) GetMarketChartByContractAddress(ctx context.Context, id, contra
 
 	var data CoinMarketChartDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal coins contract market chart response", "error", err)
+		slog.Error("failed to unmarshal coin market chart data response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -832,7 +832,7 @@ func (c *Client) GetMarketChartRangeByContractAddress(ctx context.Context, id, c
 
 	var data CoinMarketChartDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal coins contract market chart range response", "error", err)
+		slog.Error("failed to unmarshal coin market chart data response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -883,7 +883,7 @@ func (c *Client) ListAllCategories(ctx context.Context) (*[]ListAllCategoriesRes
 
 	var data []ListAllCategoriesResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal coins categories list response", "error", err)
+		slog.Error("failed to unmarshal list all categories response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -912,7 +912,7 @@ func (c *Client) ListAllCategoriesWithMarketData(ctx context.Context, order stri
 
 	var data []ListAllCategoriesWithMarketDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal coins categories response", "error", err)
+		slog.Error("failed to unmarshal list categories with market data response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -976,7 +976,7 @@ func (c *Client) ListAllMarketsInfo(ctx context.Context) (*[]ExchangeMarketsInfo
 
 	var data []ExchangeMarketsInfoResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal exchanges list response", "error", err)
+		slog.Error("failed to unmarshal exchange markets info response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -1020,7 +1020,7 @@ func (c *Client) GetExchangeVolumeAndTickersByExchangeID(ctx context.Context, id
 
 	var data ExchangeVolumeAndTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal exchanges id response", "error", err)
+		slog.Error("failed to unmarshal exchanges volume and tickers response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -1100,7 +1100,7 @@ func (c *Client) GetExchangeTickersByExchangeID(ctx context.Context, id, coinIDs
 
 	var data ExchangeTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal exchanges id tickers response", "error", err)
+		slog.Error("failed to unmarshal exchange tickers response", "error", err)
 		return nil, -1, err
 	}
 	return &data, pageCount, nil
@@ -1139,7 +1139,7 @@ func (c *Client) GetExchangeVolumeChartByExchangeID(ctx context.Context, id stri
 
 	var data []ExchangeVolumeChartResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal exchanges id volume chart response", "error", err)
+		slog.Error("failed to unmarshal exchange volume chart response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -1172,7 +1172,7 @@ func (c *Client) ListAllDerivativesTickers(ctx context.Context, includeTickers s
 
 	var data []DerivativesTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal derivatives response", "error", err)
+		slog.Error("failed to unmarshal derivatives tickers response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -1274,7 +1274,7 @@ func (c *Client) ListDerivativesExchangeData(ctx context.Context, id, includeTic
 
 	var data DerivativesExchangeTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal derivatives exchanges id response", "error", err)
+		slog.Error("failed to unmarshal derivatives exchange tickers response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -1293,7 +1293,7 @@ func (c *Client) ListAllDerivativeExchangeInfo(ctx context.Context) (*[]Derivati
 
 	var data []DerivativesExchangeInfoResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal derivatives exchanges list response", "error", err)
+		slog.Error("failed to unmarshal derivatives exchange info response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -1349,7 +1349,7 @@ func (c *Client) ListAllNFTInfo(ctx context.Context, order, assetPlatformID stri
 
 	var data []NFTInfoResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal nfts list response", "error", err)
+		slog.Error("failed to unmarshal nft info response", "error", err)
 		return nil, -1, err
 	}
 	return &data, pageCount, nil
@@ -1378,7 +1378,7 @@ func (c *Client) GetNFTDataByNFTID(ctx context.Context, id string) (*NFTDataResp
 
 	var data NFTDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal nfts id response", "error", err)
+		slog.Error("failed to unmarshal nft data response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -1414,7 +1414,7 @@ func (c *Client) GetNFTDataByAssetPlatformIDAndContractAddress(ctx context.Conte
 
 	var data NFTDataResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal nfts contract response", "error", err)
+		slog.Error("failed to unmarshal nft data response", "error", err)
 		return nil, err
 	}
 	return &data, nil
@@ -1505,7 +1505,7 @@ func (c *Client) GetGlobalCryptocurrencyData(ctx context.Context) (*GlobalCrypto
 
 	var data GlobalCryptocurrencyResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
-		slog.Error("failed to unmarshal global response", "error", err)
+		slog.Error("failed to unmarshal global cryptocurrency response", "error", err)
 		return nil, err
 	}
 	return &data, nil
