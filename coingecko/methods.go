@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/bufdata/coingecko-api/util"
 )
 
 // Ping checks API server status.
@@ -443,7 +445,7 @@ func (c *Client) GetCoinTickersByCoinID(ctx context.Context, id, exchangeIDs str
 		slog.Error("failed to parse total http response header", "total", totalInt)
 		return nil, -1, err
 	}
-	pageCount := calculateTotalPages(totalInt, 100)
+	pageCount := util.CalculateTotalPages(totalInt, 100)
 
 	var data CoinTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
@@ -951,7 +953,7 @@ func (c *Client) ListAllExchanges(ctx context.Context, perPage, page uint) (*[]E
 		slog.Error("failed to parse total http response header", "total", totalInt)
 		return nil, -1, err
 	}
-	pageCount := calculateTotalPages(totalInt, int(perPage))
+	pageCount := util.CalculateTotalPages(totalInt, int(perPage))
 
 	var data []ExchangesResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
@@ -1096,7 +1098,7 @@ func (c *Client) GetExchangeTickersByExchangeID(ctx context.Context, id, coinIDs
 		slog.Error("failed to parse total http response header", "total", totalInt)
 		return nil, -1, err
 	}
-	pageCount := calculateTotalPages(totalInt, 100)
+	pageCount := util.CalculateTotalPages(totalInt, 100)
 
 	var data ExchangeTickersResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
@@ -1220,7 +1222,7 @@ func (c *Client) ListAllDerivativesExchanges(ctx context.Context, order string, 
 		slog.Error("failed to parse total http response header", "total", totalInt)
 		return nil, -1, err
 	}
-	pageCount := calculateTotalPages(totalInt, int(perPage))
+	pageCount := util.CalculateTotalPages(totalInt, int(perPage))
 
 	var data []DerivativesExchangesResponse
 	if err = json.Unmarshal(resp, &data); err != nil {
@@ -1345,7 +1347,7 @@ func (c *Client) ListAllNFTInfo(ctx context.Context, order, assetPlatformID stri
 		slog.Error("failed to parse total http response header", "total", totalInt)
 		return nil, -1, err
 	}
-	pageCount := calculateTotalPages(totalInt, int(perPage))
+	pageCount := util.CalculateTotalPages(totalInt, int(perPage))
 
 	var data []NFTInfoResponse
 	if err = json.Unmarshal(resp, &data); err != nil {

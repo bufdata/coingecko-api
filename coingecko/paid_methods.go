@@ -7,6 +7,8 @@ import (
 	"log/slog"
 	"net/url"
 	"strconv"
+
+	"github.com/bufdata/coingecko-api/util"
 )
 
 // ListLatest200Coins gets the latest 200 coins (id & activated time) that recently listed on CoinGecko.com.
@@ -171,7 +173,7 @@ func (c *Client) ListAllNFTsMarketsData(ctx context.Context, assetPlatformID, or
 		slog.Error("failed to parse total http response header", "total", totalInt)
 		return nil, -1, err
 	}
-	pageCount := calculateTotalPages(totalInt, int(perPage))
+	pageCount := util.CalculateTotalPages(totalInt, int(perPage))
 
 	var data []NFTsMarketsResponse
 	if err = json.Unmarshal(resp, &data); err != nil {

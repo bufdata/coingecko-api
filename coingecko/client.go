@@ -8,7 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/neuprotron/coingecko-api/util"
+	"github.com/bufdata/coingecko-api/util"
 )
 
 // Client struct
@@ -24,10 +24,10 @@ type Client struct {
 // Therefore, you should provide apiKey and set isProAPIKey to true.
 func NewCoinGecko(apiKey string, isProAPIKey bool, httpClient *http.Client) *Client {
 	var apiURL string
-	if apiKey == "" || !isProAPIKey {
-		apiURL = publicAPIEndpoint
-	} else {
+	if apiKey != "" && isProAPIKey {
 		apiURL = proAPIEndpoint
+	} else {
+		apiURL = publicAPIEndpoint
 	}
 
 	if httpClient == nil {
