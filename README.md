@@ -1,8 +1,8 @@
 # CoinGecko API
 
-[![Build Status](https://travis-ci.com/neuprotron/coingecko-api.svg?branch=main)](https://travis-ci.com/neuprotron/coingecko-api)
-[![GoDoc](https://pkg.go.dev/github.com/neuprotron/coingecko-api?status.svg)](https://pkg.go.dev/github.com/neuprotron/coingecko-api)
-![GitHub](https://img.shields.io/badge/license-MIT-green)
+[![Build Status](https://travis-ci.com/bufdata/coingecko-api.svg?branch=main)](https://travis-ci.com/bufdata/coingecko-api)
+[![GoDoc](https://pkg.go.dev/github.com/bufdata/coingecko-api?status.svg)](https://pkg.go.dev/github.com/bufdata/coingecko-api)
+[![license](https://img.shields.io/badge/license-MIT-green)](https://github.com/bufdata/coingecko-api/blob/main/LICENSE)
 
 [![](https://static.coingecko.com/s/coingecko-logo-d13d6bcceddbb003f146b33c2f7e8193d72b93bb343d38e392897c3df3e78bdd.png)](https://coingecko.com)
 [![](https://www.geckoterminal.com/_next/static/media/logo_dark.6b1547fe.png)](https://www.geckoterminal.com)
@@ -15,7 +15,7 @@ This library contains two apis:
 ## Installation
 
 ```shell
-go get -u github.com/neuprotron/coingecko-api
+go get -u github.com/bufdata/coingecko-api
 ```
 
 ## Usage
@@ -29,17 +29,16 @@ package main
 
 import (
 	"context"
-	"log"
 	"log/slog"
 
-	"github.com/neuprotron/coingecko-api/coingecko"
+	"github.com/bufdata/coingecko-api/coingecko"
 )
 
 func main() {
 	api := coingecko.NewCoinGecko("your_api_key", false, nil)
 	data, err := api.ListCoinsInfo(context.Background(), true)
 	if err != nil {
-		log.Fatalln(err)
+		slog.Error("failed to call ListCoinsInfo", "error", err)
 	}
 	slog.Info("call ListSupportedCoinsInfo successfully", "response data", (*data)[0])
 }
@@ -52,17 +51,16 @@ package main
 
 import (
 	"context"
-	"log"
 	"log/slog"
 
-	"github.com/neuprotron/coingecko-api/coingecko"
+	"github.com/bufdata/coingecko-api/coingecko"
 )
 
 func main() {
 	api := coingecko.NewCoinGecko("your_api_key", true, nil)
 	data, err := api.ListCoinsInfo(context.Background(), true)
 	if err != nil {
-		log.Fatalln(err)
+		slog.Error("failed to call ListCoinsInfo", "error", err)
 	}
 	slog.Info("call ListSupportedCoinsInfo successfully", "response data", (*data)[0])
 }
@@ -79,17 +77,16 @@ package main
 
 import (
 	"context"
-	"log"
 	"log/slog"
 
-	"github.com/neuprotron/coingecko-api/geckoterminal"
+	"github.com/bufdata/coingecko-api/geckoterminal"
 )
 
 func main() {
 	api := geckoterminal.NewGeckoTerminal(nil)
 	data, err := api.GetNetworks(context.Background(), 0)
 	if err != nil {
-		log.Fatalln(err)
+		slog.Error("failed to call GetNetworks", "error", err)
 	}
 	slog.Info("call GetNetworks successfully", "response data", *data)
 }

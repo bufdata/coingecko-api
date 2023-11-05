@@ -840,7 +840,7 @@ func (c *Client) GetMarketChartRangeByContractAddress(ctx context.Context, id, c
 	return &data, nil
 }
 
-// AssetPlatforms lists all asset platforms(Blockchain networks).
+// ListAllAssetPlatforms lists all asset platforms(Blockchain networks).
 //
 // Query parameters:
 //
@@ -1513,7 +1513,7 @@ func (c *Client) GetGlobalCryptocurrencyData(ctx context.Context) (*GlobalCrypto
 	return &data, nil
 }
 
-// GetGlobalDefiData gets Top 100 Cryptocurrency Global Decentralized Finance(defi) data.
+// GetGlobalTop100DefiData gets Top 100 Cryptocurrency Global Decentralized Finance(defi) data.
 //
 // Cache/Update Frequency: every 60 minutes.
 func (c *Client) GetGlobalTop100DefiData(ctx context.Context) (*GlobalDefiResponse, error) {

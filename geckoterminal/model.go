@@ -47,12 +47,12 @@ type TokenInfoResponse struct {
 	Data TokenInfoDataItem `json:"data"`
 }
 
-// PoolTokensInfoResponse
+// PoolTokensInfoResponse returned by GetPoolTokensInfoOnOneNetwork API.
 type PoolTokensInfoResponse struct {
 	Data []TokenInfoDataItem `json:"data"`
 }
 
-// RecentlyUpdatedTokensResponse
+// RecentlyUpdatedTokensResponse returned by GetRecentlyUpdated100TokensInfo API.
 type RecentlyUpdatedTokensResponse struct {
 	Data    []TokenInfoDataItem      `json:"data"`
 	Include []TokensInfoIncludedItem `json:"included"`
