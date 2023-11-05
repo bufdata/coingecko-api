@@ -20,3 +20,8 @@ func GetLogger(name string) {
 	logger := slog.New(jsonHandler)
 	slog.SetDefault(logger)
 }
+
+// CalculateTotalPages calculates page number.
+func CalculateTotalPages(totalCount, pageSize int) int {
+	return (totalCount + pageSize - 1) / pageSize
+}

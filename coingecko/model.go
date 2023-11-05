@@ -421,7 +421,3 @@ type ListAllTokensResponse struct {
 		Patch int `json:"patch"`
 	} `json:"version"`
 }
-
-func calculateTotalPages(totalCount, pageSize int) int {
-	return (totalCount + pageSize - 1) / pageSize
-}

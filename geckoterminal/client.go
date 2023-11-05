@@ -8,7 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/neuprotron/coingecko-api/util"
+	"github.com/bufdata/coingecko-api/util"
 )
 
 // Client struct
