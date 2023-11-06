@@ -21,7 +21,7 @@ func GetLogger(name string) {
 	slog.SetDefault(logger)
 }
 
-// CalculateTotalPages calculates page number.
+// CalculateTotalPages calculates total page number.
 func CalculateTotalPages(totalCount, pageSize int) int {
 	return (totalCount + pageSize - 1) / pageSize
 }
