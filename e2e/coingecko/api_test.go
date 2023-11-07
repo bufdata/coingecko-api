@@ -275,7 +275,7 @@ func TestClient_ListDerivativesExchangeData(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	slog.Info("call ListDerivativesExchangeData successfully", "response data", (*data).Name)
+	slog.Info("call ListDerivativesExchangeData successfully", "response data", data.Name)
 }
 
 func TestClient_ListAllDerivativeExchangeInfo(t *testing.T) {
@@ -365,5 +365,5 @@ func TestClient_GetCompaniesPublicTreasury(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	slog.Info("call GetCompaniesPublicTreasury successfully", "response data", (*data).MarketCapDominance)
+	slog.Info("call GetCompaniesPublicTreasury successfully", "response data", data.MarketCapDominance)
 }
