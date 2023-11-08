@@ -15,14 +15,14 @@ func TestNewCoinGecko(t *testing.T) {
 		wantedResult string
 	}{
 		{
-			name:         "api key is empty",
-			apiKey:       "",
-			isPro:        false,
+			name:         "pro api key",
+			apiKey:       "test_api_key",
+			isPro:        true,
 			httpClient:   nil,
-			wantedResult: publicAPIEndpoint,
+			wantedResult: proAPIEndpoint,
 		},
 		{
-			name:         "api key is nonempty but no pro",
+			name:         "public api",
 			apiKey:       "test_api_key",
 			isPro:        false,
 			httpClient:   nil,
@@ -31,16 +31,16 @@ func TestNewCoinGecko(t *testing.T) {
 		{
 			name:         "api key is nonempty and pro",
 			apiKey:       "test_api_key",
-			isPro:        true,
+			isPro:        false,
 			httpClient:   nil,
-			wantedResult: proAPIEndpoint,
+			wantedResult: publicAPIEndpoint,
 		},
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			c := NewCoinGecko(tt.apiKey, tt.isPro, tt.httpClient)
 			if c.apiURL != tt.wantedResult {
-				t.Fatalf("uncorrect api url, wanted url: %s, got url: %s", tt.wantedResult, c.apiKey)
+				t.Fatalf("uncorrect api url, wanted url: %s, got url: %s", tt.wantedResult, c.apiURL)
 			}
 		})
 	}
