@@ -70,6 +70,11 @@ If you use `coingecko` library in production, you might need to set your own `ht
 
 This library has covered all APIs. For detailed APIs info, you can read [CoinGecko docs](https://www.coingecko.com/api/documentation).
 
+**Note**
+
+The methods in `coingecko/paid_methods.go` and `coingecko/enterprise_methods.go` are not tested, so if you find there 
+are some bugs in them, you can raise pr or issue.
+
 ### GeckoTerminal
 
 ```go

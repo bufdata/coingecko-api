@@ -13,6 +13,6 @@ func TestGetLogger(t *testing.T) {
 func TestCalculateTotalPages(t *testing.T) {
 	result := CalculateTotalPages(1009, 100)
 	if result != 11 {
-		t.Fatalf("uncorrect total page number, wanted result: 11, got result: %d", result)
+		t.Fatalf("incorrect total page number, wanted result: 11, got result: %d", result)
 	}
 }

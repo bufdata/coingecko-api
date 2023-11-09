@@ -131,13 +131,13 @@ func (c *Client) SimplePrice(ctx context.Context, ids, vsCurrencies []string, in
 func (c *Client) SimpleTokenPrice(ctx context.Context, id string, contractAddresses, vsCurrencies []string, includeMarketCap, include24hrVol,
 	include24hrChange, includeLastUpdatedAt, precision string) (*map[string]map[string]float64, error) {
 	if id == "" {
-		return nil, fmt.Errorf("id shouldn't be empty")
+		return nil, fmt.Errorf("id should not be empty")
 	}
 	if len(contractAddresses) == 0 {
-		return nil, fmt.Errorf("the length of contract addresses should be greater than 0")
+		return nil, fmt.Errorf("the length of contractAddresses should be greater than 0")
 	}
 	if len(vsCurrencies) == 0 {
-		return nil, fmt.Errorf("the length of vs currencies should be greater than 0")
+		return nil, fmt.Errorf("the length of vsCurrencies should be greater than 0")
 	}
 
 	contractAddressParams := strings.Join(contractAddresses, ",")

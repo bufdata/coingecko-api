@@ -22,16 +22,23 @@ func TestNewCoinGecko(t *testing.T) {
 			wantedResult: proAPIEndpoint,
 		},
 		{
-			name:         "public api",
+			name:         "public api key",
 			apiKey:       "test_api_key",
 			isPro:        false,
 			httpClient:   nil,
 			wantedResult: publicAPIEndpoint,
 		},
 		{
-			name:         "api key is nonempty and pro",
-			apiKey:       "test_api_key",
+			name:         "api key is empty and non pro",
+			apiKey:       "",
 			isPro:        false,
+			httpClient:   nil,
+			wantedResult: publicAPIEndpoint,
+		},
+		{
+			name:         "api key is empty and pro",
+			apiKey:       "",
+			isPro:        true,
 			httpClient:   nil,
 			wantedResult: publicAPIEndpoint,
 		},
@@ -40,7 +47,7 @@ func TestNewCoinGecko(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := NewCoinGecko(tt.apiKey, tt.isPro, tt.httpClient)
 			if c.apiURL != tt.wantedResult {
-				t.Fatalf("uncorrect api url, wanted url: %s, got url: %s", tt.wantedResult, c.apiURL)
+				t.Fatalf("incorrect api url, wanted url: %s, got url: %s", tt.wantedResult, c.apiURL)
 			}
 		})
 	}
@@ -52,6 +59,6 @@ func Test_checkAPIKey(t *testing.T) {
 	c.checkAPIKey(req)
 	result := req.Header.Get(proAPIKeyHeader)
 	if result != "test" {
-		t.Fatalf("uncorrect http header, wanted header: %s", result)
+		t.Fatalf("incorrect http header, wanted header: %s", result)
 	}
 }
