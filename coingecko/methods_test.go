@@ -2,9 +2,7 @@ package coingecko
 
 import (
 	"context"
-	"encoding/json"
 	"math"
-	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"strings"
@@ -20,12 +18,8 @@ func TestClient_Ping(t *testing.T) {
 		wantedErrStr string
 	}{
 		{
-			name: "success",
-			server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				resp := &PingResponse{GeckoSays: "ok"}
-				data, _ := json.Marshal(resp)
-				_, _ = w.Write(data)
-			})),
+			name:         "success",
+			server:       mockHTTPServer(t, &PingResponse{GeckoSays: "ok"}),
 			wantedIsErr:  false,
 			wantedResult: &PingResponse{GeckoSays: "ok"},
 			wantedErrStr: "",
@@ -39,10 +33,10 @@ func TestClient_Ping(t *testing.T) {
 		},
 		{
 			name:         "failed to unmarshal json",
-			server:       mockInvalidJSONHTTPServer(t),
+			server:       mockHTTPServer(t, []byte(`{"name":what?}`)),
 			wantedIsErr:  true,
 			wantedResult: nil,
-			wantedErrStr: invalidCharacterJSONErrStr,
+			wantedErrStr: incorrectJSONTypeErrStr,
 		},
 	}
 	for _, tt := range cases {
@@ -80,32 +74,24 @@ func TestClient_SimplePrice(t *testing.T) {
 			name:         "success",
 			ids:          []string{"ethereum"},
 			vsCurrencies: []string{"usd"},
-			server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				resp := map[string]map[string]float64{
-					"ethereum": {"usd": 1901.02},
-				}
-				data, _ := json.Marshal(resp)
-				_, _ = w.Write(data)
-			})),
-			wantedIsErr: false,
-			wantedResult: &map[string]map[string]float64{
-				"ethereum": {"usd": 1901.02},
-			},
+			server:       mockHTTPServer(t, &map[string]map[string]float64{"ethereum": {"usd": 1901.02}}),
+			wantedIsErr:  false,
+			wantedResult: &map[string]map[string]float64{"ethereum": {"usd": 1901.02}},
 			wantedErrStr: "",
 		},
 		{
-			name:         "incorrect ids param",
+			name:         "empty ids param",
 			ids:          nil,
-			server:       mockHTTPServer(t),
+			server:       mockHTTPServer(t, nil),
 			wantedIsErr:  true,
 			wantedResult: nil,
 			wantedErrStr: "the length of ids should be greater than 0",
 		},
 		{
-			name:         "incorrect ids vs_currencies param",
+			name:         "empty vsCurrencies param",
 			ids:          []string{"ethereum"},
 			vsCurrencies: nil,
-			server:       mockHTTPServer(t),
+			server:       mockHTTPServer(t, nil),
 			wantedIsErr:  true,
 			wantedResult: nil,
 			wantedErrStr: "the length of vsCurrencies should be greater than 0",
@@ -123,13 +109,7 @@ func TestClient_SimplePrice(t *testing.T) {
 			name:         "failed to unmarshal json",
 			ids:          []string{"ethereum"},
 			vsCurrencies: []string{"usd"},
-			server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				resp := map[string]map[string]float64{
-					"ethereum": {"usd": math.NaN()},
-				}
-				data, _ := json.Marshal(resp)
-				_, _ = w.Write(data)
-			})),
+			server:       mockHTTPServer(t, &map[string]map[string]float64{"ethereum": {"usd": math.NaN()}}),
 			wantedIsErr:  true,
 			wantedResult: nil,
 			wantedErrStr: unexpectedEndJSONInputErrStr,
@@ -172,42 +152,35 @@ func TestClient_SimpleTokenPrice(t *testing.T) {
 			id:                "ethereum",
 			contractAddresses: []string{"0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"},
 			vsCurrencies:      []string{"usd"},
-			server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				resp := map[string]map[string]float64{
-					"0x1f9840a85d5af5bf1d1762f925bdaddc4201f984": {"usd": 5.22},
-				}
-				data, _ := json.Marshal(resp)
-				_, _ = w.Write(data)
-			})),
-			wantedIsErr: false,
-			wantedResult: &map[string]map[string]float64{
-				"0x1f9840a85d5af5bf1d1762f925bdaddc4201f984": {"usd": 5.22},
-			},
+			server: mockHTTPServer(t, &map[string]map[string]float64{
+				"0x1f9840a85d5af5bf1d1762f925bdaddc4201f984": {"usd": 5.22}}),
+			wantedIsErr:  false,
+			wantedResult: &map[string]map[string]float64{"0x1f9840a85d5af5bf1d1762f925bdaddc4201f984": {"usd": 5.22}},
 			wantedErrStr: "",
 		},
 		{
-			name:         "incorrect id param",
+			name:         "empty id param",
 			id:           "",
-			server:       mockHTTPServer(t),
+			server:       mockHTTPServer(t, nil),
 			wantedIsErr:  true,
 			wantedResult: nil,
 			wantedErrStr: "id should not be empty",
 		},
 		{
-			name:              "incorrect contractAddresses param",
+			name:              "empty contractAddresses param",
 			id:                "ethereum",
 			contractAddresses: nil,
-			server:            mockHTTPServer(t),
+			server:            mockHTTPServer(t, nil),
 			wantedIsErr:       true,
 			wantedResult:      nil,
 			wantedErrStr:      "the length of contractAddresses should be greater than 0",
 		},
 		{
-			name:              "incorrect vsCurrencies param",
+			name:              "empty vsCurrencies param",
 			id:                "ethereum",
 			contractAddresses: []string{"0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"},
 			vsCurrencies:      nil,
-			server:            mockHTTPServer(t),
+			server:            mockHTTPServer(t, nil),
 			wantedIsErr:       true,
 			wantedResult:      nil,
 			wantedErrStr:      "the length of vsCurrencies should be greater than 0",
@@ -227,16 +200,10 @@ func TestClient_SimpleTokenPrice(t *testing.T) {
 			id:                "ethereum",
 			contractAddresses: []string{"0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"},
 			vsCurrencies:      []string{"usd"},
-			server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				resp := map[string]map[string]float64{
-					"ethereum": {"usd": math.NaN()},
-				}
-				data, _ := json.Marshal(resp)
-				_, _ = w.Write(data)
-			})),
-			wantedIsErr:  true,
-			wantedResult: nil,
-			wantedErrStr: unexpectedEndJSONInputErrStr,
+			server:            mockHTTPServer(t, &map[string]map[string]float64{"ethereum": {"usd": math.NaN()}}),
+			wantedIsErr:       true,
+			wantedResult:      nil,
+			wantedErrStr:      unexpectedEndJSONInputErrStr,
 		},
 	}
 	for _, tt := range cases {
@@ -269,12 +236,8 @@ func TestClient_SimpleSupportedVSCurrencies(t *testing.T) {
 		wantedErrStr string
 	}{
 		{
-			name: "success",
-			server: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				resp := &SimpleSupportedVSCurrenciesResponse{"usd", "eur"}
-				data, _ := json.Marshal(resp)
-				_, _ = w.Write(data)
-			})),
+			name:         "success",
+			server:       mockHTTPServer(t, &SimpleSupportedVSCurrenciesResponse{"usd", "eur"}),
 			wantedIsErr:  false,
 			wantedResult: &SimpleSupportedVSCurrenciesResponse{"usd", "eur"},
 			wantedErrStr: "",
@@ -288,10 +251,10 @@ func TestClient_SimpleSupportedVSCurrencies(t *testing.T) {
 		},
 		{
 			name:         "failed to unmarshal json",
-			server:       mockInvalidJSONHTTPServer(t),
+			server:       mockHTTPServer(t, []byte(`{"name":what?}`)),
 			wantedIsErr:  true,
 			wantedResult: nil,
-			wantedErrStr: invalidCharacterJSONErrStr,
+			wantedErrStr: incorrectJSONTypeErrStr,
 		},
 	}
 	for _, tt := range cases {
@@ -314,3 +277,141 @@ func TestClient_SimpleSupportedVSCurrencies(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_ListCoinsInfo(t *testing.T) {
+	cases := []struct {
+		name         string
+		server       *httptest.Server
+		wantedIsErr  bool
+		wantedResult *[]ListCoinsInfoResponse
+		wantedErrStr string
+	}{
+		{
+			name: "success",
+			server: mockHTTPServer(t, &[]ListCoinsInfoResponse{
+				{
+					coinsStruct{
+						ID:     "ethereum",
+						Symbol: "eth",
+						Name:   "Ethereum",
+					},
+					nil,
+				},
+			}),
+			wantedIsErr: false,
+			wantedResult: &[]ListCoinsInfoResponse{
+				{
+					coinsStruct{
+						ID:     "ethereum",
+						Symbol: "eth",
+						Name:   "Ethereum",
+					},
+					nil,
+				},
+			},
+			wantedErrStr: "",
+		},
+		{
+			name:         "failed to call api",
+			server:       mockErrorHTTPServer(t),
+			wantedIsErr:  true,
+			wantedResult: nil,
+			wantedErrStr: statusCode400ErrStr,
+		},
+		{
+			name:         "failed to unmarshal json",
+			server:       mockHTTPServer(t, []byte(`{"name":what?}`)),
+			wantedIsErr:  true,
+			wantedResult: nil,
+			wantedErrStr: incorrectJSONTypeErrStr,
+		},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			client := setup(t)
+			client.apiURL = tt.server.URL
+			result, err := client.ListCoinsInfo(context.TODO(), false)
+			if tt.wantedIsErr {
+				if !strings.Contains(err.Error(), tt.wantedErrStr) {
+					t.Fatalf("incorrect error, wanted error: %v, got error: %v", tt.wantedErrStr, err)
+				}
+			} else {
+				if err != nil {
+					t.Fatalf("error should be nil, got: %v", err)
+				}
+			}
+			if !reflect.DeepEqual(result, tt.wantedResult) {
+				t.Fatalf("incorrect response, wanted result: %+v, got result: %+v", tt.wantedResult, result)
+			}
+		})
+	}
+}
+
+// func TestClient_ListCoinsMarketsData(t *testing.T) {
+// 	cases := []struct {
+// 		name         string
+// 		server       *httptest.Server
+// 		wantedIsErr  bool
+// 		wantedResult *[]ListCoinsMarketsDataResponse
+// 		wantedErrStr string
+// 	}{
+// 		{
+// 			name: "success",
+// 			server: mockHTTPServer(t, &[]ListCoinsMarketsDataResponse{
+// 				{
+// 					coinsStruct{
+// 						ID:     "ethereum",
+// 						Symbol: "eth",
+// 						Name:   "Ethereum",
+// 					},
+// 					"",
+// 				},
+// 			}),
+// 			wantedIsErr: false,
+// 			wantedResult: &[]ListCoinsMarketsDataResponse{
+// 				{
+// 					coinsStruct{
+// 						ID:     "ethereum",
+// 						Symbol: "eth",
+// 						Name:   "Ethereum",
+// 					},
+// 					nil,
+// 				},
+// 			},
+// 			wantedErrStr: "",
+// 		},
+// 		{
+// 			name:         "failed to call api",
+// 			server:       mockErrorHTTPServer(t),
+// 			wantedIsErr:  true,
+// 			wantedResult: nil,
+// 			wantedErrStr: statusCode400ErrStr,
+// 		},
+// 		{
+// 			name:         "failed to unmarshal json",
+// 			server:       mockHTTPServer(t, []byte(`{"name":what?}`)),
+// 			wantedIsErr:  true,
+// 			wantedResult: nil,
+// 			wantedErrStr: incorrectJSONTypeErrStr,
+// 		},
+// 	}
+// 	for _, tt := range cases {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			client := setup(t)
+// 			client.apiURL = tt.server.URL
+// 			result, err := client.ListCoinsMarketsData(context.TODO(), false)
+// 			if tt.wantedIsErr {
+// 				if !strings.Contains(err.Error(), tt.wantedErrStr) {
+// 					t.Fatalf("incorrect error, wanted error: %v, got error: %v", tt.wantedErrStr, err)
+// 				}
+// 			} else {
+// 				if err != nil {
+// 					t.Fatalf("error should be nil, got: %v", err)
+// 				}
+// 			}
+// 			if !reflect.DeepEqual(result, tt.wantedResult) {
+// 				t.Fatalf("incorrect response, wanted result: %+v, got result: %+v", tt.wantedResult, result)
+// 			}
+// 		})
+// 	}
+// }
