@@ -279,13 +279,9 @@ func (c *Client) ListCoinsMarketsData(ctx context.Context, vsCurrency string, id
 	}
 	if perPage != 0 {
 		params.Add("per_page", strconv.Itoa(int(perPage)))
-	} else {
-		params.Add("per_page", "100")
 	}
 	if page != 0 {
 		params.Add("page", strconv.Itoa(int(page)))
-	} else {
-		params.Add("page", "1")
 	}
 	params.Add("sparkline", strconv.FormatBool(sparkline))
 	if len(priceChangePercentage) != 0 {
