@@ -11,7 +11,7 @@ help:
 
 # only run unit tests, exclude e2e tests
 test:
-	go test -failfast $$(go list ./... | grep -v e2e) -timeout 99999s
+	go clean -testcache && go test -failfast $$(go list ./... | grep -v e2e) -timeout 99999s
 
 vet:
 	go vet ./...
