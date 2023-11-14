@@ -351,12 +351,3 @@ type TokensListAllItem struct {
 	Decimals int    `json:"decimals"`
 	LogoURI  string `json:"logoURI"`
 }
-
-// {
-//            "chainId": 137,
-//            "address": "0x52468c88e8b4f5bcca20a6a7813355637dc5e3ad",
-//            "name": "Power Of Deep Ocean",
-//            "symbol": "PODO",
-//            "decimals": 18,
-//            "logoURI": "https://assets.coingecko.com/coins/images/27645/thumb/PODO_TICKER_200.png?1665020330"
-//        },

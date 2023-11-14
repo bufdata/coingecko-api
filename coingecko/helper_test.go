@@ -28,6 +28,14 @@ func mockHTTPServer(t *testing.T, resp any) *httptest.Server {
 	return svr
 }
 
+func mockStringHTTPServer(t *testing.T, resp string) *httptest.Server {
+	t.Helper()
+	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(resp))
+	}))
+	return svr
+}
+
 func mockErrorHTTPServer(t *testing.T) *httptest.Server {
 	t.Helper()
 	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
