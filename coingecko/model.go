@@ -403,9 +403,7 @@ type NFTTickersResponse struct {
 
 // CoinCirculatingSupplyChartResponse returned by GetCirculatingSupplyChartByCoinID API.
 type CoinCirculatingSupplyChartResponse struct {
-	CirculatingSupply []struct {
-		CoinsIDCirculatingSupplyChartItem
-	} `json:"circulating_supply"`
+	CirculatingSupply []CoinsIDCirculatingSupplyChartItem `json:"circulating_supply"`
 }
 
 // ListAllTokensResponse returned by ListAllTokensByAssetPlatformID API.
@@ -413,7 +411,7 @@ type ListAllTokensResponse struct {
 	Name      string              `json:"name"`
 	LogoURI   string              `json:"logoURI"`
 	Keywords  []string            `json:"keywords"`
-	Timestamp time.Time           `json:"timestamp"`
+	Timestamp string              `json:"timestamp"`
 	Tokens    []TokensListAllItem `json:"tokens"`
 	Version   struct {
 		Major int `json:"major"`

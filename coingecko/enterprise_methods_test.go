@@ -18,29 +18,12 @@ func TestClient_GetCirculatingSupplyChartByCoinID(t *testing.T) {
 		wantedErrStr string
 	}{
 		{
-			name: "success",
-			server: mockHTTPServer(t, &CoinCirculatingSupplyChartResponse{CirculatingSupply: []struct {
-				CoinsIDCirculatingSupplyChartItem
-			}{
-				{
-					CoinsIDCirculatingSupplyChartItem{
-						"1666224000000",
-						"19184000.0",
-					},
-				},
-			}}),
+			name:        "success",
+			server:      mockStringHTTPServer(t, `{"circulating_supply": [[1666224000000,"19184000.0"]]}`),
 			id:          "ethereum",
 			wantedIsErr: false,
-			wantedResult: &CoinCirculatingSupplyChartResponse{CirculatingSupply: []struct {
-				CoinsIDCirculatingSupplyChartItem
-			}{
-				{
-					CoinsIDCirculatingSupplyChartItem{
-						"1666224000000",
-						"19184000.0",
-					},
-				},
-			}},
+			wantedResult: &CoinCirculatingSupplyChartResponse{CirculatingSupply: []CoinsIDCirculatingSupplyChartItem{
+				{"1666224000000", "19184000.0"}}},
 			wantedErrStr: "",
 		},
 		{
@@ -99,29 +82,12 @@ func TestClient_GetCirculatingSupplyChartRangeByCoinID(t *testing.T) {
 		wantedErrStr string
 	}{
 		{
-			name: "success",
-			server: mockHTTPServer(t, &CoinCirculatingSupplyChartResponse{CirculatingSupply: []struct {
-				CoinsIDCirculatingSupplyChartItem
-			}{
-				{
-					CoinsIDCirculatingSupplyChartItem{
-						"1666224000000",
-						"19184000.0",
-					},
-				},
-			}}),
+			name:        "success",
+			server:      mockStringHTTPServer(t, `{"circulating_supply": [[1666224000000,"19184000.0"]]}`),
 			id:          "ethereum",
 			wantedIsErr: false,
-			wantedResult: &CoinCirculatingSupplyChartResponse{CirculatingSupply: []struct {
-				CoinsIDCirculatingSupplyChartItem
-			}{
-				{
-					CoinsIDCirculatingSupplyChartItem{
-						"1666224000000",
-						"19184000.0",
-					},
-				},
-			}},
+			wantedResult: &CoinCirculatingSupplyChartResponse{CirculatingSupply: []CoinsIDCirculatingSupplyChartItem{
+				{"1666224000000", "19184000.0"}}},
 			wantedErrStr: "",
 		},
 		{
@@ -171,27 +137,6 @@ func TestClient_GetCirculatingSupplyChartRangeByCoinID(t *testing.T) {
 }
 
 func TestClient_ListAllTokensByAssetPlatformID(t *testing.T) {
-	// resp := &ListAllTokensResponse{
-	// 	Name:      "CoinGecko",
-	// 	LogoURI:   "https://www.coingecko.com/assets/thumbnail-007177f3eca19695592f0b8b0eabbdae282b54154e1be912285c9034ea6cbaf2.png",
-	// 	Keywords:  []string{"defi"},
-	// 	Timestamp: time.Unix(1666224000, 0),
-	// 	Tokens: []TokensListAllItem{
-	// 		{
-	// 			ChainID:  137,
-	// 			Address:  "0xb33eaad8d922b1083446dc23f610c2567fb5180f",
-	// 			Name:     "Uniswap",
-	// 			Symbol:   "UNI",
-	// 			Decimals: 18,
-	// 			LogoURI:  "https://assets.coingecko.com/coins/images/12504/thumb/uniswap-uni.png?1600306604",
-	// 		},
-	// 	},
-	// 	Version: struct {
-	// 		Major int `json:"major"`
-	// 		Minor int `json:"minor"`
-	// 		Patch int `json:"patch"`
-	// 	}{141, 4, 0},
-	// }
 	cases := []struct {
 		name         string
 		server       *httptest.Server
@@ -200,14 +145,34 @@ func TestClient_ListAllTokensByAssetPlatformID(t *testing.T) {
 		wantedResult *ListAllTokensResponse
 		wantedErrStr string
 	}{
-		// {
-		// 	name:         "success",
-		// 	server:       mockHTTPServer(t, resp),
-		// 	id:           "polygon-pos",
-		// 	wantedIsErr:  false,
-		// 	wantedResult: resp,
-		// 	wantedErrStr: "",
-		// },
+		{
+			name:        "success",
+			server:      mockStringHTTPServer(t, `{"name":"CoinGecko","logoURI":"https://www.coingecko.com/assets/thumbnail-007177f3eca19695592f0b8b0eabbdae282b54154e1be912285c9034ea6cbaf2.png","keywords": ["defi"],"timestamp": "2022-10-21T02:05:57.841+00:00","tokens": [{"chainId":137,"address":"0xb33eaad8d922b1083446dc23f610c2567fb5180f","name":"Uniswap","symbol":"UNI","decimals":18,"logoURI":"https://assets.coingecko.com/coins/images/12504/thumb/uniswap-uni.png?1600306604"}],"version":{"major":141,"minor":4,"patch":0}}`),
+			id:          "polygon-pos",
+			wantedIsErr: false,
+			wantedResult: &ListAllTokensResponse{
+				Name:      "CoinGecko",
+				LogoURI:   "https://www.coingecko.com/assets/thumbnail-007177f3eca19695592f0b8b0eabbdae282b54154e1be912285c9034ea6cbaf2.png",
+				Keywords:  []string{"defi"},
+				Timestamp: "2022-10-21T02:05:57.841+00:00",
+				Tokens: []TokensListAllItem{
+					{
+						ChainID:  137,
+						Address:  "0xb33eaad8d922b1083446dc23f610c2567fb5180f",
+						Name:     "Uniswap",
+						Symbol:   "UNI",
+						Decimals: 18,
+						LogoURI:  "https://assets.coingecko.com/coins/images/12504/thumb/uniswap-uni.png?1600306604",
+					},
+				},
+				Version: struct {
+					Major int `json:"major"`
+					Minor int `json:"minor"`
+					Patch int `json:"patch"`
+				}{141, 4, 0},
+			},
+			wantedErrStr: "",
+		},
 		{
 			name:         "empty id param",
 			id:           "",
