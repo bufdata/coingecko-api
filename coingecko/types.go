@@ -330,13 +330,19 @@ type TopGainerLosersItem struct {
 	USD1hChange   float64 `json:"usd_1h_change"`
 }
 
+// MarketCapChartItem used for GlobalMarketCapChartResponse.
+type MarketCapChartItem struct {
+	MarketCap []ChartItem `json:"market_cap"`
+	Volume    []ChartItem `json:"volume"`
+}
+
 // NFTsIDTickersItem used for NFTsIDTickersResponse.
 type NFTsIDTickersItem struct {
-	FloorPriceInNativeCurrency float64   `json:"floor_price_in_native_currency"`
-	H24VolumeInNativeCurrency  float64   `json:"h24_volume_in_native_currency"`
-	NativeCurrency             string    `json:"native_currency"`
-	UpdatedAt                  time.Time `json:"updated_at"`
-	NFTMarketplaceID           string    `json:"nft_marketplace_id"`
+	FloorPriceInNativeCurrency float64 `json:"floor_price_in_native_currency"`
+	H24VolumeInNativeCurrency  float64 `json:"h24_volume_in_native_currency"`
+	NativeCurrency             string  `json:"native_currency"`
+	UpdatedAt                  string  `json:"updated_at"`
+	NFTMarketplaceID           string  `json:"nft_marketplace_id"`
 }
 
 // CoinsIDCirculatingSupplyChartItem used for CoinsIDCirculatingSupplyChartResponse.

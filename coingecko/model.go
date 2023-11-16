@@ -354,16 +354,13 @@ type ListLatest200CoinsResponse struct {
 
 // CoinsTopGainersLosersResponse returned by GetTopGainersLosers API.
 type CoinsTopGainersLosersResponse struct {
-	TopGainers []struct{ TopGainerLosersItem } `json:"top_gainers"`
-	TopLosers  []struct{ TopGainerLosersItem } `json:"top_losers"`
+	TopGainers []TopGainerLosersItem `json:"top_gainers"`
+	TopLosers  []TopGainerLosersItem `json:"top_losers"`
 }
 
 // GlobalMarketCapChartResponse returned by GetGlobalMarketCapChartData API.
 type GlobalMarketCapChartResponse struct {
-	MarketCapChart struct {
-		MarketCap []ChartItem `json:"market_cap"`
-		Volume    []ChartItem `json:"volume"`
-	} `json:"market_cap_chart"`
+	MarketCapChart MarketCapChartItem `json:"market_cap_chart"`
 }
 
 // NFTsMarketsResponse returned by ListAllNFTsMarketsData API.
@@ -398,7 +395,7 @@ type NFTsIDMarketChartResponse struct {
 
 // NFTTickersResponse returned by GetNFTTickersByNFTID API.
 type NFTTickersResponse struct {
-	Tickers []struct{ NFTsIDTickersItem } `json:"tickers"`
+	Tickers []NFTsIDTickersItem `json:"tickers"`
 }
 
 // CoinCirculatingSupplyChartResponse returned by GetCirculatingSupplyChartByCoinID API.
