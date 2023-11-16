@@ -8,8 +8,10 @@ const (
 
 const (
 	applicationJSONHeader = "application/json"
-	proAPIKeyQueryParam   = "x_cg_pro_api_key"
-	proAPIKeyHeader       = "x-cg-pro-api-key"
+	totalHeader           = "total"
+
+	proAPIKeyQueryParam = "x_cg_pro_api_key"
+	proAPIKeyHeader     = "x-cg-pro-api-key"
 )
 
 // CoinGecko API path

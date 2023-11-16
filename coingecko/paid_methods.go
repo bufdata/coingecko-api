@@ -51,7 +51,7 @@ func (c *Client) ListLatest200Coins(ctx context.Context) (*[]ListLatest200CoinsR
 // not have MarketCap ranking). Valid values: 300, 500, 1000, all. Default value: 1000.
 func (c *Client) GetTopGainersLosers(ctx context.Context, vsCurrency, duration, topCoins string) (*CoinsTopGainersLosersResponse, error) {
 	if vsCurrency == "" {
-		return nil, fmt.Errorf("vs_currency should not be empty")
+		return nil, fmt.Errorf("vsCurrency should not be empty")
 	}
 
 	params := url.Values{}
@@ -167,7 +167,7 @@ func (c *Client) ListAllNFTsMarketsData(ctx context.Context, assetPlatformID, or
 		return nil, -1, err
 	}
 
-	total := header.Get("total")
+	total := header.Get(totalHeader)
 	totalInt, err := strconv.Atoi(total)
 	if err != nil {
 		slog.Error("failed to parse total http response header", "total", totalInt)
@@ -252,10 +252,10 @@ func (c *Client) GetMarketChartByNFTID(ctx context.Context, id, days string) (*N
 func (c *Client) GetMarketChartByNFTContractAddress(ctx context.Context, assetPlatformID, contractAddress, days string) (
 	*NFTsIDMarketChartResponse, error) {
 	if assetPlatformID == "" {
-		return nil, fmt.Errorf("asset_platform_id should not be empty")
+		return nil, fmt.Errorf("assetPlatformID should not be empty")
 	}
 	if contractAddress == "" {
-		return nil, fmt.Errorf("contract_address should not be empty")
+		return nil, fmt.Errorf("contractAddress should not be empty")
 	}
 
 	params := url.Values{}
@@ -331,11 +331,11 @@ func (c *Client) GetVolumeChartRangeByExchangeID(ctx context.Context, id string,
 	if id == "" {
 		return nil, fmt.Errorf("exchange id should not be empty")
 	}
-	if from == 0 {
-		return nil, fmt.Errorf("from should not be empty")
+	if from <= 0 {
+		return nil, fmt.Errorf("from should not be less than or equal to 0")
 	}
-	if to == 0 {
-		return nil, fmt.Errorf("to should not be empty")
+	if to <= 0 {
+		return nil, fmt.Errorf("to should not be less than or equal to 0")
 	}
 
 	params := url.Values{}
