@@ -435,7 +435,7 @@ func (c *Client) GetCoinTickersByCoinID(ctx context.Context, id, exchangeIDs str
 		return nil, -1, err
 	}
 
-	total := header.Get("total")
+	total := header.Get(totalHeader)
 	totalInt, err := strconv.Atoi(total)
 	if err != nil {
 		slog.Error("failed to parse total http response header", "total", totalInt)
@@ -943,7 +943,7 @@ func (c *Client) ListAllExchanges(ctx context.Context, perPage, page uint) (*[]E
 		return nil, -1, err
 	}
 
-	total := header.Get("total")
+	total := header.Get(totalHeader)
 	totalInt, err := strconv.Atoi(total)
 	if err != nil {
 		slog.Error("failed to parse total http response header", "total", totalInt)
@@ -1088,7 +1088,7 @@ func (c *Client) GetExchangeTickersByExchangeID(ctx context.Context, id, coinIDs
 		return nil, -1, err
 	}
 
-	total := header.Get("total")
+	total := header.Get(totalHeader)
 	totalInt, err := strconv.Atoi(total)
 	if err != nil {
 		slog.Error("failed to parse total http response header", "total", totalInt)
@@ -1212,7 +1212,7 @@ func (c *Client) ListAllDerivativesExchanges(ctx context.Context, order string, 
 		return nil, -1, err
 	}
 
-	total := header.Get("total")
+	total := header.Get(totalHeader)
 	totalInt, err := strconv.Atoi(total)
 	if err != nil {
 		slog.Error("failed to parse total http response header", "total", totalInt)
@@ -1337,7 +1337,7 @@ func (c *Client) ListAllNFTInfo(ctx context.Context, order, assetPlatformID stri
 		return nil, -1, err
 	}
 
-	total := header.Get("total")
+	total := header.Get(totalHeader)
 	totalInt, err := strconv.Atoi(total)
 	if err != nil {
 		slog.Error("failed to parse total http response header", "total", totalInt)
