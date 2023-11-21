@@ -1,8 +1,11 @@
 # CoinGecko API
 
+[![Go Version](https://img.shields.io/badge/go-v1.21.1-green.svg)](https://golang.org/dl/)
+[![Code Lint](https://github.com/bufdata/coingecko-api/actions/workflows/code-lint.yml/badge.svg)](https://github.com/bufdata/coingecko-api/actions/workflows/code-lint.yml)
+[![Unit Test](https://github.com/bufdata/coingecko-api/actions/workflows/unit-test.yml/badge.svg)](https://github.com/bufdata/coingecko-api/actions/workflows/unit-test.yml)
 [![Build Status](https://travis-ci.com/bufdata/coingecko-api.svg?branch=main)](https://travis-ci.com/bufdata/coingecko-api)
 [![GoDoc](https://pkg.go.dev/github.com/bufdata/coingecko-api?status.svg)](https://pkg.go.dev/github.com/bufdata/coingecko-api)
-[![license](https://img.shields.io/badge/license-MIT-green)](https://github.com/bufdata/coingecko-api/blob/main/LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/bufdata/coingecko-api/blob/main/LICENSE)
 
 [![](https://static.coingecko.com/s/coingecko-logo-d13d6bcceddbb003f146b33c2f7e8193d72b93bb343d38e392897c3df3e78bdd.png)](https://coingecko.com)
 [![](https://www.geckoterminal.com/_next/static/media/logo_dark.6b1547fe.png)](https://www.geckoterminal.com)
