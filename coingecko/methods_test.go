@@ -382,43 +382,25 @@ func TestClient_ListCoinsInfo(t *testing.T) {
 // 		wantedErrStr string
 // 	}{
 // 		{
-// 			name: "success",
-// 			server: mockHTTPServer(t, &[]ListCoinsMarketsDataResponse{
-// 				{
-// 					coinsStruct{
-// 						ID:     "ethereum",
-// 						Symbol: "eth",
-// 						Name:   "Ethereum",
-// 					},
-// 					"",
-// 				},
-// 			}),
-// 			wantedIsErr: false,
-// 			wantedResult: &[]ListCoinsMarketsDataResponse{
-// 				{
-// 					coinsStruct{
-// 						ID:     "ethereum",
-// 						Symbol: "eth",
-// 						Name:   "Ethereum",
-// 					},
-// 					nil,
-// 				},
-// 			},
+// 			name:         "success",
+// 			server:       nil,
+// 			wantedIsErr:  false,
+// 			wantedResult: nil,
 // 			wantedErrStr: "",
 // 		},
 // 		{
 // 			name:         "failed to call api",
-// 			server:       mockErrorHTTPServer(t),
+// 			server:       mockErrorHTTPServer(t, ""),
 // 			wantedIsErr:  true,
 // 			wantedResult: nil,
 // 			wantedErrStr: statusCode400ErrStr,
 // 		},
 // 		{
 // 			name:         "failed to unmarshal json",
-// 			server:       mockHTTPServer(t, []byte(`{"name":what?}`)),
+// 			server:       mockHTTPServer(t, "", invalidJSONString),
 // 			wantedIsErr:  true,
 // 			wantedResult: nil,
-// 			wantedErrStr: incorrectJSONTypeErrStr,
+// 			wantedErrStr: invalidCharacterJSONErrStr,
 // 		},
 // 	}
 // 	for _, tt := range cases {

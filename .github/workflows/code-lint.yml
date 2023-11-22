@@ -1,4 +1,4 @@
-name: Golang Code Lint
+name: Code Lint
 
 on:
   push:
