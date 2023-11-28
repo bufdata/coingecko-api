@@ -39,12 +39,12 @@ type ListCoinsMarketsDataResponse struct {
 	MaxSupply                           *float64       `json:"max_supply"`
 	Ath                                 float64        `json:"ath"`
 	AthChangePercentage                 float64        `json:"ath_change_percentage"`
-	AthDate                             time.Time      `json:"ath_date"`
+	AthDate                             string         `json:"ath_date"`
 	Atl                                 float64        `json:"atl"`
 	AtlChangePercentage                 float64        `json:"atl_change_percentage"`
-	AtlDate                             time.Time      `json:"atl_date"`
+	AtlDate                             string         `json:"atl_date"`
 	ROI                                 *ROIItem       `json:"roi"`
-	LastUpdated                         time.Time      `json:"last_updated"`
+	LastUpdated                         string         `json:"last_updated"`
 	SparklineIn7d                       *SparklineItem `json:"sparkline_in_7d,omitempty"`
 	PriceChangePercentage1hInCurrency   float64        `json:"price_change_percentage_1h_in_currency,omitempty"`
 	PriceChangePercentage24hInCurrency  float64        `json:"price_change_percentage_24h_in_currency,omitempty"`
