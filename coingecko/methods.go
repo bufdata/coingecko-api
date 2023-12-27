@@ -250,7 +250,7 @@ func (c *Client) ListCoinsInfo(ctx context.Context, includePlatform bool) (*[]Li
 //
 // page(optional): page through results. Default value: 1.
 //
-// sparkline(optional): include sparkline 7 days data (eg. true, false). Default value: false.
+// sparkline(optional): include sparkline 7 days data (e.g. true, false). Default value: false.
 //
 // price_change_percentage(optional): include price change percentage in 1h, 24h, 7d, 14d, 30d, 200d, 1y
 // (eg. '1h,24h,7d' comma-separated, invalid values will be discarded).
@@ -262,7 +262,7 @@ func (c *Client) ListCoinsInfo(ctx context.Context, includePlatform bool) (*[]Li
 func (c *Client) ListCoinsMarketsData(ctx context.Context, vsCurrency string, ids []string, category, order string, perPage, page uint,
 	sparkline bool, priceChangePercentage []string, locale, precision string) (*[]ListCoinsMarketsDataResponse, error) {
 	if vsCurrency == "" {
-		return nil, fmt.Errorf("vs currencies should not be empty")
+		return nil, fmt.Errorf("vsCurrency should not be empty")
 	}
 
 	params := url.Values{}

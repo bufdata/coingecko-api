@@ -373,53 +373,161 @@ func TestClient_ListCoinsInfo(t *testing.T) {
 	}
 }
 
-// func TestClient_ListCoinsMarketsData(t *testing.T) {
-// 	cases := []struct {
-// 		name         string
-// 		server       *httptest.Server
-// 		wantedIsErr  bool
-// 		wantedResult *[]ListCoinsMarketsDataResponse
-// 		wantedErrStr string
-// 	}{
-// 		{
-// 			name:         "success",
-// 			server:       nil,
-// 			wantedIsErr:  false,
-// 			wantedResult: nil,
-// 			wantedErrStr: "",
-// 		},
-// 		{
-// 			name:         "failed to call api",
-// 			server:       mockErrorHTTPServer(t, ""),
-// 			wantedIsErr:  true,
-// 			wantedResult: nil,
-// 			wantedErrStr: statusCode400ErrStr,
-// 		},
-// 		{
-// 			name:         "failed to unmarshal json",
-// 			server:       mockHTTPServer(t, "", invalidJSONString),
-// 			wantedIsErr:  true,
-// 			wantedResult: nil,
-// 			wantedErrStr: invalidCharacterJSONErrStr,
-// 		},
-// 	}
-// 	for _, tt := range cases {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			client := setup(t)
-// 			client.apiURL = tt.server.URL
-// 			result, err := client.ListCoinsMarketsData(context.TODO(), false)
-// 			if tt.wantedIsErr {
-// 				if !strings.Contains(err.Error(), tt.wantedErrStr) {
-// 					t.Fatalf("incorrect error, wanted error: %v, got error: %v", tt.wantedErrStr, err)
-// 				}
-// 			} else {
-// 				if err != nil {
-// 					t.Fatalf("error should be nil, got: %v", err)
-// 				}
-// 			}
-// 			if !reflect.DeepEqual(result, tt.wantedResult) {
-// 				t.Fatalf("incorrect response, wanted result: %+v, got result: %+v", tt.wantedResult, result)
-// 			}
-// 		})
-// 	}
-// }
+func TestClient_ListCoinsMarketsData(t *testing.T) {
+	var maxSupply = 1000000000.0
+	cases := []struct {
+		name         string
+		vsCurrency   string
+		server       *httptest.Server
+		wantedIsErr  bool
+		wantedResult *[]ListCoinsMarketsDataResponse
+		wantedErrStr string
+	}{
+		{
+			name:        "success",
+			vsCurrency:  "usd",
+			server:      mockHTTPServer(t, "", `[{"id": "uniswap","symbol": "uni","name": "Uniswap","image": "https://assets.coingecko.com/coins/images/12504/large/uni.jpg?1696512319","current_price": 6.13,"market_cap": 4621266016,"market_cap_rank": 21,"fully_diluted_valuation": 6130897290,"total_volume": 477396644,"high_24h": 6.27,"low_24h": 5.18,"price_change_24h": 0.918302,"price_change_percentage_24h": 17.61082,"market_cap_change_24h": 681728375,"market_cap_change_percentage_24h": 17.30478,"circulating_supply": 753766667.0,"total_supply": 1000000000.0,"max_supply": 1000000000.0,"ath": 44.92,"ath_change_percentage": -86.35145,"ath_date": "2021-05-03T05:25:04.822Z","atl": 1.03,"atl_change_percentage": 495.11135,"atl_date": "2020-09-17T01:20:38.214Z","roi": null,"last_updated": "2023-11-23T03:07:17.295Z"}]`),
+			wantedIsErr: false,
+			wantedResult: &[]ListCoinsMarketsDataResponse{
+				{
+					coinsStruct: coinsStruct{
+						ID:     "uniswap",
+						Symbol: "uni",
+						Name:   "Uniswap",
+					},
+					Image:                        "https://assets.coingecko.com/coins/images/12504/large/uni.jpg?1696512319",
+					CurrentPrice:                 6.13,
+					MarketCap:                    4621266016,
+					MarketCapRank:                21,
+					FullyDilutedValuation:        6130897290,
+					TotalVolume:                  477396644,
+					High24h:                      6.27,
+					Low24h:                       5.18,
+					PriceChange24h:               0.918302,
+					PriceChangePercentage24h:     17.61082,
+					MarketCapChange24h:           681728375,
+					MarketCapChangePercentage24h: 17.30478,
+					CirculatingSupply:            753766667.0,
+					TotalSupply:                  1000000000.0,
+					MaxSupply:                    &maxSupply,
+					Ath:                          44.92,
+					AthChangePercentage:          -86.35145,
+					AthDate:                      "2021-05-03T05:25:04.822Z",
+					Atl:                          1.03,
+					AtlChangePercentage:          495.11135,
+					AtlDate:                      "2020-09-17T01:20:38.214Z",
+					ROI:                          nil,
+					LastUpdated:                  "2023-11-23T03:07:17.295Z",
+				},
+			},
+			wantedErrStr: "",
+		},
+		{
+			name:         "empty vsCurrency query param",
+			vsCurrency:   "",
+			server:       mockHTTPServer(t, "", ""),
+			wantedIsErr:  true,
+			wantedResult: nil,
+			wantedErrStr: "vsCurrency should not be empty",
+		},
+		{
+			name:         "failed to call api",
+			vsCurrency:   "usd",
+			server:       mockErrorHTTPServer(t, ""),
+			wantedIsErr:  true,
+			wantedResult: nil,
+			wantedErrStr: statusCode400ErrStr,
+		},
+		{
+			name:         "failed to unmarshal json",
+			vsCurrency:   "usd",
+			server:       mockHTTPServer(t, "", invalidJSONString),
+			wantedIsErr:  true,
+			wantedResult: nil,
+			wantedErrStr: invalidCharacterJSONErrStr,
+		},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			client := setup(t)
+			client.apiURL = tt.server.URL
+			result, err := client.ListCoinsMarketsData(context.TODO(), tt.vsCurrency, []string{"ethereum"}, "decentralized-exchange",
+				"market_cap_desc", 100, 1, false, []string{"1h"}, "en", "full")
+			if tt.wantedIsErr {
+				if !strings.Contains(err.Error(), tt.wantedErrStr) {
+					t.Fatalf("incorrect error, wanted error: %v, got error: %v", tt.wantedErrStr, err)
+				}
+			} else {
+				if err != nil {
+					t.Fatalf("error should be nil, got: %v", err)
+				}
+			}
+			if !reflect.DeepEqual(result, tt.wantedResult) {
+				t.Fatalf("incorrect response, wanted result: %+v, got result: %+v", tt.wantedResult, result)
+			}
+		})
+	}
+}
+
+func TestClient_GetCoinDataByCoinID(t *testing.T) {
+	cases := []struct {
+		name         string
+		id           string
+		server       *httptest.Server
+		wantedIsErr  bool
+		wantedResult *CoinDataResponse
+		wantedErrStr string
+	}{
+		// {
+		// 	name:         "success",
+		// 	id:           "ethereum",
+		// 	server:       mockHTTPServer(t, "", ""),
+		// 	wantedIsErr:  false,
+		// 	wantedResult: nil,
+		// 	wantedErrStr: "",
+		// },
+		{
+			name:         "empty coin id path param",
+			id:           "",
+			server:       mockHTTPServer(t, "", ""),
+			wantedIsErr:  true,
+			wantedResult: nil,
+			wantedErrStr: "coin id should not be empty",
+		},
+		{
+			name:         "failed to call api",
+			id:           "ethereum",
+			server:       mockErrorHTTPServer(t, ""),
+			wantedIsErr:  true,
+			wantedResult: nil,
+			wantedErrStr: statusCode400ErrStr,
+		},
+		{
+			name:         "failed to unmarshal json",
+			id:           "ethereum",
+			server:       mockHTTPServer(t, "", invalidJSONString),
+			wantedIsErr:  true,
+			wantedResult: nil,
+			wantedErrStr: invalidCharacterJSONErrStr,
+		},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			client := setup(t)
+			client.apiURL = tt.server.URL
+			result, err := client.GetCoinDataByCoinID(context.TODO(), tt.id, true, true, true, true, true, true)
+			if tt.wantedIsErr {
+				if !strings.Contains(err.Error(), tt.wantedErrStr) {
+					t.Fatalf("incorrect error, wanted error: %v, got error: %v", tt.wantedErrStr, err)
+				}
+			} else {
+				if err != nil {
+					t.Fatalf("error should be nil, got: %v", err)
+				}
+			}
+			if !reflect.DeepEqual(result, tt.wantedResult) {
+				t.Fatalf("incorrect response, wanted result: %+v, got result: %+v", tt.wantedResult, result)
+			}
+		})
+	}
+}

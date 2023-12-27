@@ -1,12 +1,12 @@
 # CoinGecko API
 
 [![Go Version](https://img.shields.io/badge/go-v1.21.1-green.svg)](https://golang.org/dl/)
-[![Code Lint](https://github.com/bufdata/coingecko-api/actions/workflows/code-lint.yml/badge.svg)](https://github.com/bufdata/coingecko-api/actions/workflows/code-lint.yml)
-[![Unit Test](https://github.com/bufdata/coingecko-api/actions/workflows/unit-test.yml/badge.svg)](https://github.com/bufdata/coingecko-api/actions/workflows/unit-test.yml)
-[![GoDoc](https://pkg.go.dev/github.com/bufdata/coingecko-api?status.svg)](https://pkg.go.dev/github.com/bufdata/coingecko-api)
-[![goreports](https://goreportcard.com/badge/github.com/bufdata/coingecko-api)](https://goreportcard.com/report/github.com/bufdata/coingecko-api)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/bufdata/coingecko-api)](https://pkg.go.dev/github.com/bufdata/coingecko-api)
+[![Go Report Card](https://goreportcard.com/badge/github.com/bufdata/coingecko-api)](https://goreportcard.com/report/github.com/bufdata/coingecko-api)
 [![Codecov](https://codecov.io/gh/bufdata/coingecko-api/branch/master/graph/badge.svg)](https://codecov.io/gh/bufdata/coingecko-api)
 [![license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/bufdata/coingecko-api/blob/main/LICENSE)
+[![Code Lint](https://github.com/bufdata/coingecko-api/actions/workflows/code-lint.yml/badge.svg)](https://github.com/bufdata/coingecko-api/actions/workflows/code-lint.yml)
+[![Unit Test](https://github.com/bufdata/coingecko-api/actions/workflows/unit-test.yml/badge.svg)](https://github.com/bufdata/coingecko-api/actions/workflows/unit-test.yml)
 [![Build Status](https://travis-ci.com/bufdata/coingecko-api.svg?branch=main)](https://travis-ci.com/bufdata/coingecko-api)
 
 [![](https://static.coingecko.com/s/coingecko-logo-d13d6bcceddbb003f146b33c2f7e8193d72b93bb343d38e392897c3df3e78bdd.png)](https://coingecko.com)
